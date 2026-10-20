@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>BidLens · 해외 전력 입찰서 분석 도구</title>
-<meta name="description" content="영문 전력 변압기 입찰서(RFP)에서 핵심 규격 31개 항목을 추출하고 자사 표준품과 비교해 Bid/No-Bid 판정, 영문 질의서, 제출 준비 목록까지 만들어 주는 도구">
+<meta name="description" content="영문 전력 변압기 입찰서(RFP)에서 핵심 규격 31개 항목을 추출해 자사 표준품과 비교하고 Bid/No-Bid 판정 · 영문 질의서 · 제출 준비 목록을 만들어 주는 도구. 세계은행 · EU 해외 전력 입찰 공고도 모아 보여줘요.">
 <meta name="theme-color" content="#0B2B55">
 <meta property="og:type" content="website">
 <meta property="og:title" content="BidLens · 해외 전력 입찰서 분석 도구">
@@ -27,6 +27,11 @@
   --gx:max(16px,env(safe-area-inset-left,0px)); --gy:max(16px,env(safe-area-inset-right,0px));
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
+.res-ex,.row-act{display:inline-flex;gap:8px;flex-wrap:nowrap}
+@media (max-width:560px){ .res-ctl{width:100%} .res-ctl #resStd{flex:1 1 100%;max-width:none!important;width:100%!important} .res-ex{flex:1 1 100%} .res-ex .btn-a{flex:1 1 0;justify-content:center} }
+.ferr{color:var(--no);font-size:12.5px;line-height:1.5;margin-top:5px}
+.ainput[aria-invalid="true"],.aselect[aria-invalid="true"]{border-color:var(--no)!important;box-shadow:0 0 0 2px color-mix(in srgb, var(--no) 18%, transparent)}
 html,body{margin:0;padding:0}
 body{background:var(--n950);color:var(--on-dark);font-family:var(--f-sans);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;word-break:keep-all;overflow-wrap:break-word}
 h1,h2,h3{text-wrap:balance;margin:0}
@@ -63,7 +68,7 @@ button{cursor:pointer}
 .nav{position:relative;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;padding-block:20px}
 .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:20px;letter-spacing:-.02em;text-decoration:none}
 .navlinks{display:flex;flex-wrap:wrap;align-items:center;gap:22px;font-size:15px}
-.navlinks a{color:var(--on-dark-3);text-decoration:none}
+.navlinks a{color:var(--on-dark-3);text-decoration:none;padding:10px 0}
 .navlinks a:hover{color:var(--cyan)}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 20px;border-radius:999px;border:1px solid transparent;font-size:15px;font-weight:600;text-decoration:none;transition:transform .15s,background-color .2s,border-color .2s}
 .btn:active{transform:scale(.98)}
@@ -88,13 +93,13 @@ button{cursor:pointer}
 .preview-body{display:flex;flex-wrap:wrap;gap:14px}
 .paper{flex:1 1 300px;min-width:0;position:relative;overflow:hidden;background:var(--paper);border-radius:12px;padding:20px 20px 14px;color:#2A3E58}
 .paper .ph{display:flex;justify-content:space-between;gap:10px;font-family:var(--f-sans);font-size:13px;font-weight:600;color:var(--ink);padding-bottom:10px;margin-bottom:12px;border-bottom:1px solid #DCE5F0}
-.paper .ph span:last-child{font-family:var(--f-mono);font-weight:500;color:#7A8CA5}
+.paper .ph span:last-child{font-family:var(--f-mono);font-weight:500;color:#5A6B83}
 .paper p.l{font-family:var(--f-mono);font-size:12px;line-height:1.75;margin-bottom:9px}
 .paper p.l b{font-weight:600;color:var(--ink)}
 .paper mark{background:var(--hl);color:var(--ink);padding:1px 2px;border-radius:3px;animation:glow 4.2s ease-in-out infinite}
 .paper mark.w{background:#FFD9A0;animation:none}
 .paper mark.q{background:#E5DCFF;animation:none}
-.paper .pf{text-align:center;font-family:var(--f-mono);font-size:11px;color:#8396AE;margin-top:6px}
+.paper .pf{text-align:center;font-family:var(--f-mono);font-size:11px;color:#5F708A;margin-top:6px}
 .scanline{position:absolute;left:0;right:0;height:2px;background:var(--cyan);box-shadow:0 0 16px 2px var(--cyan);animation:scan 5s ease-in-out infinite}
 .prev-rows{flex:2 1 380px;display:flex;flex-direction:column;gap:8px;min-width:0}
 .prow{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:13px 16px;background:var(--n800);border-radius:10px;font-size:15px}
@@ -107,7 +112,7 @@ button{cursor:pointer}
 .verdict-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:15px 16px;border:1px solid rgba(255,210,122,.4);border-radius:10px;color:#FFD27A;font-weight:600}
 
 .marquee{overflow:hidden;margin-top:72px;padding:6px 0}
-.track{display:flex;width:max-content;gap:48px;padding-right:48px;font-family:var(--f-mono);font-size:15px;color:#7A90AC;animation:marquee 34s linear infinite}
+.track{display:flex;width:max-content;gap:48px;padding-right:48px;font-family:var(--f-mono);font-size:15px;color:#9DB2CE;animation:marquee 34s linear infinite}
 .track .c{color:var(--cyan)}
 
 .sec{padding-block:110px}
@@ -135,7 +140,7 @@ button{cursor:pointer}
 .fcard:hover{border-color:var(--cyan);transform:translateY(-3px)}
 .fcard h3{font-size:19px;font-weight:600;margin:20px 0 10px}
 .fcard p{color:var(--on-dark-3);font-size:15px;line-height:1.7}
-.fcard .kbd{display:inline-block;margin-top:14px;font-family:var(--f-mono);font-size:12px;color:var(--on-dark-4)}
+.fcard .kbd{display:inline-block;margin-top:14px;font-family:var(--f-sans);font-size:12.5px;color:var(--on-dark-4)}
 .steps-line{position:relative;height:2px;background:var(--nline);margin:0 4% 32px}
 .dot{position:absolute;top:-3px;width:8px;height:8px;border-radius:50%;background:var(--cyan);animation:flow 2.6s linear infinite}
 .grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:32px}
@@ -185,9 +190,9 @@ button{cursor:pointer}
 .foot{border-top:1px solid #142F55}
 .foot .top{display:flex;flex-wrap:wrap;justify-content:space-between;gap:32px;padding-block:48px}
 .foot .cols{display:flex;flex-wrap:wrap;gap:56px;font-size:14px}
-.foot .cols div{display:flex;flex-direction:column;gap:10px}
+.foot .cols div{display:flex;flex-direction:column;gap:2px}
 .foot .cols span{color:var(--on-dark);font-weight:600}
-.foot .cols a{color:var(--on-dark-3);text-decoration:none}
+.foot .cols a{color:var(--on-dark-3);text-decoration:none;padding:7px 0}
 .foot .cols a:hover{color:var(--cyan)}
 .foot .bot{padding-block:20px 36px;border-top:1px solid #142F55;font-size:13px;color:var(--on-dark-4);line-height:1.7}
 
@@ -334,6 +339,10 @@ table.tbl{width:100%;min-width:860px;border-collapse:collapse;font-size:14px;col
 .list-row{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px 12px;padding:16px 20px;border-top:1px solid #EDF2F8}
 .list-row:first-child{border-top:none}
 .list-row .t{font-weight:600;overflow-wrap:anywhere}
+.lv-tag{display:inline-block;font-size:12px;line-height:1.5;padding:1px 8px;border-radius:4px;background:#EEF3FA;color:var(--ink-2);margin:0 6px 4px 0;border:1px solid #DCE6F2}
+.live-act{flex:0 1 auto;justify-content:flex-end}
+@media (max-width:700px){ .live-cats{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-left:calc(-1 * var(--gx, 16px));margin-right:calc(-1 * var(--gx, 16px));padding:0 var(--gx, 16px) 4px;-webkit-mask-image:linear-gradient(90deg,#000 85%,transparent);mask-image:linear-gradient(90deg,#000 85%,transparent)} .live-cats::-webkit-scrollbar{display:none} .live-cats .chip{flex:none} }
+.chip[aria-pressed="true"] .hint{color:#BFD2EA}
 .list-row .s2{font-size:13px;color:var(--ink-3);overflow-wrap:anywhere}
 .confirm{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:14px;color:var(--no)}
 .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));gap:14px}
@@ -559,6 +568,19 @@ html[data-theme="e"] .lp .proof{border-radius:0}
 <body>
 
 <div id="root"></div>
+<script data-compat>
+(function(){
+  var ok = true;
+  try { new RegExp('(?<!a)b'); } catch(e){ ok = false; }
+  if(ok) return;
+  window.__blUnsupported = true;
+  function show(){
+    var r = document.getElementById('root') || document.body;
+    r.innerHTML = '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:#0B2B55;color:#EAF0F7;font-family:-apple-system,BlinkMacSystemFont,sans-serif;text-align:center"><div style="max-width:420px"><p style="font-size:22px;font-weight:700;margin:0 0 12px">BidLens</p><p style="font-size:16px;line-height:1.7;margin:0 0 8px">이 브라우저에서는 BidLens를 실행할 수 없어요.</p><p style="font-size:14px;line-height:1.7;color:#BFD2EA;margin:0">iPhone · iPad는 iOS 16.4 이상으로 업데이트하거나, 최신 Chrome · Safari · Edge · Firefox로 열어 주세요.</p></div></div>';
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', show); else show();
+})();
+</script>
 <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 <div id="themer"></div>
 
@@ -630,8 +652,10 @@ var BL = (function(){
     if(cells.length === 3){ var u = cells[1]; return cells[0] + ': ' + cells[2] + (u && u !== '-' && u.length <= 8 && !new RegExp('\\b' + u.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i').test(cells[2]) ? ' ' + u : ''); }
     return s;
   }
+  var ROW_UNIT = /^(?:\d{1,3}[a-z]?\.?\s+)?([A-Za-z][A-Za-z ()\/,&'-]{2,60}?)\s+(kV|MVA|kVA|Hz|%|dB\s?\(A\)|kW|K|°C|weeks?|months?|-)\s+(\S[^\n]{0,28})$/;
+  function unitRows(s){ return /\|/.test(s) ? s : s.split('\n').map(function(l){ var m = l.match(ROW_UNIT); if(!m || !/\d|^[A-Z]{2,}/.test(m[3])) return l; var u = m[2] === '-' || new RegExp('\\b' + m[2].replace(/[()]/g, '\\$&') + '(?![A-Za-z])').test(m[3]) ? '' : ' ' + m[2]; return m[1] + ': ' + m[3] + u; }).join('\n'); }
   function canon(s){
-    return numWords(tableRow(String(s)))
+    return numWords(tableRow(unitRows(String(s).replace(/([^\s])[ \t]*per[ \t]*cent\b/gi, '$1%'))))
       .replace(/\.{3,}|…/g, ' ')
       .replace(/(\d)\s*kV\s*Grd\.?\s?Y\b/g, '$1 kV').replace(/(\d+(?:\.\d+)?)\s*\/\s*(?:√|sqrt\s*\(?)\s*3\)?/gi, '$1')
       .replace(/(\d)\s?(?:KV|kv|Kv)\b/g, '$1 kV').replace(/\bKV\b|\bkv\b|\bKv\b/g, 'kV').replace(/(\d)\s?(?:mva|Mva)\b/g, '$1 MVA')
@@ -656,7 +680,6 @@ var BL = (function(){
     return String(t || '')
       .replace(/\r/g, '').replace(/[‐-―−]/g, '-').replace(/[‘’]/g, "'").replace(/[“”]/g, '"')
       .replace(/[º˚]/g, '°').replace(/ﬁ/g, 'fi').replace(/ﬂ/g, 'fl').replace(/­/g, '')
-      .replace(/([^\s])[ \t]*per[ \t]*cent\b/gi, '$1%').replace(/([^\s])[ \t]*percent\b/gi, '$1%')
       .replace(/[ \t ]+/g, ' ').replace(/ *\n */g, '\n').replace(/\n{3,}/g, '\n\n').trim();
   }
   var HEAD_RE = /^(?:\d+(?:\.\d+)*\.?\s|[A-Z]{2,5}\s?\d+(?:\.\d+)*\.?\s|(?:Section|SECTION|Clause|Article|Part|Annex|Appendix)\b|\(?[a-z]\)\s|\(?[ivx]{1,4}\)\s|[•\-–*]\s|[A-Z][A-Za-z ]{1,32}:\s)/;
@@ -723,8 +746,8 @@ var BL = (function(){
         var lines = (pages[0] ? pages[0].text : '').split('\n');
         for(var i = 0; i < lines.length && i < 14; i++){
           var l = lines[i].trim().replace(/\s*\((?:the\s+)?(?:Employer|Purchaser|Owner|Client|Procuring Entity)\)\s*$/i, '').replace(/\s*\([A-Z]{2,8}\)(?:,\s*[A-Z][a-z]+)?\s*$/, '').replace(/^.*\s[-–]\s(?=[A-Z][A-Z ]+$)/, '');
-          if(l.length < 80 && !/\d|:|\(/.test(l) && /(authority|corporation|company|utility|utilities|board|commission|ministry|agency|electricity|power|energy|cooperative|limited|railways?|empresa|energ[ií]a|el[eé]ctrica|berhad|bhd|jsc|gmbh|s\.?a\.?|administration)\b/i.test(l) && !/request|proposal|tender|supply|bid|transformer|specification/i.test(l)){
-            var caps = l.split(/\s+/).length >= 3; return { v: { text: !caps ? l : l.replace(/\w\S*/g, function(w){ return /^(?:OF|AND|THE|FOR|DE)$/.test(w) ? w.toLowerCase() : w.length > 3 && w === w.toUpperCase() ? w.charAt(0) + w.slice(1).toLowerCase() : w; }).replace(/^(.)/, function(c){ return c.toUpperCase(); }) }, page: pages[0].n, quote: l };
+          if(l.length < 80 && !/\d|:|\(/.test(l) && /(authority|corporation|company|utility|utilities|board|commission|ministry|agency|electricity|power|energy|cooperative|limited|railways?|empresa|energ[ií]a|el[eé]ctrica|berhad|bhd|jsc|gmbh|s\.?a\.?|administration|transmission|co\.|inc\.)(?:\b|$)/i.test(l) && !/request|proposal|tender|supply|bid|transformer|specification/i.test(l)){
+            var caps = l.split(/\s+/).length >= 3; return { v: { text: !caps ? l : l.replace(/\w\S*/g, function(w){ return /^(?:OF|AND|THE|FOR|DE)$/.test(w) ? w.toLowerCase() : w.length > 3 && w === w.toUpperCase() ? w.charAt(0) + w.slice(1).toLowerCase() : w; }).replace(/^(.)/, function(c){ return c.toUpperCase(); }).replace(/\bCO\.(?=\s|$)/g, 'Co.').replace(/\bINC\.(?=\s|$)/g, 'Inc.').replace(/\bLTD\.?(?=\s|$)/g, 'Ltd.') }, page: pages[0].n, quote: l };
           }
         }
         var first = pages.slice(0, 3).map(function(p){ return p.n; });
@@ -762,9 +785,9 @@ var BL = (function(){
       show:function(v){ return v.text; } },
     { k:'quantity', g:'basic', label:'수량', en:'Quantity', noCtx: true,
       skip:/at least|minimum|experience|supplied|similar|in (?:successful )?operation|references?|manufactured|track record|turnover|last \d|past \d/i,
-      kw:/quantity|\bqty\b|\bNos?\.|\bunits?\b|\bsets?\b|\d\s*x\s|transformers?\b/i,
+      kw:/quantity|\bqty\b|\bNos?\.|\bunits?\b|\bsets?\b|\d\s*x\s|transformers?\b|reactors?\b/i,
       parse:function(s){
-        var m = s.match(/(?:quantity|\bqty\.?)\s*(?:required)?\s*[:\-]?\s*(\d{1,3})\b(?!\s*(?:kV|MVA|%|Hz))/i) || s.match(/(?<![\d.\/])(\d{1,3})\s*(?:Nos?\.?|units?|sets?)(?=[\s,.()]|$)/i) || s.match(/(?<![\d.\/±+\-])(?<![±+\-]\s)(\d{1,2})\s*x\s*\d+(?![\d.,]*\s*%)/i) || s.match(/(?:of|for|supply|deliver\w*)\s+(?:the\s+)?(\d{1,3})(?!\s*(?:kV|MVA|kVA|Hz|%|\/|-|\.\d|years?|months?|weeks?|days?|hours?)\b)\s+(?:[\w\/.-]+\s+){0,4}(?:transformers?|reactors?|autotransformers?)\b/i) || s.match(/^(\d{1,3})(?!\s*(?:kV|MVA|kVA|Hz|%|\/|-|\.\d|years?|months?|weeks?|days?)\b)\s+(?:[\w-]+\s+){0,3}(?:transformers?|autotransformers?)\b/i);
+        var m = s.match(/(?:quantity|\bqty\.?)\s*(?:required)?\s*[:\-]?\s*(\d{1,3})\b(?!\s*(?:kV|MVA|%|Hz))/i) || s.match(/(?<![\d.\/])(\d{1,3})\s*(?:Nos?\.?|units?|sets?)(?=[\s,.()]|$)/i) || s.match(/(?<![\d.\/±+\-])(?<![±+\-]\s)(\d{1,2})\s*x\s*\d+(?![\d.,]*\s*%)/i) || s.match(/(?:of|for|supply|deliver\w*)\s+(?:the\s+)?(\d{1,3})(?!\s*(?:kV|MVA|kVA|Hz|%|\/|-|\.\d|years?|months?|weeks?|days?|hours?)\b)\s+(?:[\w\/.,()-]+\s+){0,8}(?:transformers?|reactors?|autotransformers?)\b/i) || s.match(/^(\d{1,3})(?!\s*(?:kV|MVA|kVA|Hz|%|\/|-|\.\d|years?|months?|weeks?|days?)\b)\s+(?:[\w-]+\s+){0,3}(?:transformers?|autotransformers?)\b/i);
         if(!m) return null; var n = +m[1]; return n >= 1 && n <= 500 ? { n: n } : null;
       },
       edit:function(s){ var n = nums(s); return n.length ? { n: n[0] } : null; },
@@ -846,8 +869,9 @@ var BL = (function(){
       edit:function(s){ var n = nums(s); return n.length ? { hv: n[0], lv: n.length > 1 ? n[1] : null } : null; },
       show:function(v){ return v.lv != null ? v.hv + '/' + v.lv + ' kV' : v.hv + ' kV'; } },
     { k:'capacity', g:'tech', label:'정격 용량', en:'Rated power', unit:'MVA',
-      kw:/MVA/i, skip:/short[- ]circuit|fault level|MVAr|kVAr|reactive|interrupting|impedance|MVA base|\bbase of\b|or (?:above|higher)|experience|similar|contracts?\b|at least|minimum|turnover/i,
+      kw:/MVA/i, skip:/short[- ]circuit|fault level|MVAr|kVAr|reactive|interrupting|or (?:above|higher)|experience|similar|contracts?\b|at least|minimum|turnover/i,
       parse:function(s){
+        s = s.replace(/(?:(?:on|at)\s+(?:a|the)\s+)?\d+(?:\.\d+)?\s*MVA\s*base\b|base of (?:the )?\d+(?:\.\d+)?\s*MVA/gi, ' ');
         var C2 = '\\s*(?:\\(?\\s*' + COOL + '\\s*\\)?)?', mm = s.match(new RegExp('(\\d{1,4}(?:\\.\\d+)?)\\s*MVA' + C2 + '\\s*\\/\\s*(\\d{1,4}(?:\\.\\d+)?)\\s*MVA(?:' + C2 + '\\s*\\/\\s*(\\d{1,4}(?:\\.\\d+)?)\\s*MVA)?'));
         if(mm){ var s3 = [+mm[1], +mm[2]].concat(mm[3] ? [+mm[3]] : []); if(s3.every(function(x, i){ return !i || x > s3[i - 1]; })) return { mva: s3[s3.length - 1], stages: s3 }; }
         var m = s.match(/(\d{1,4}(?:\.\d+)?)((?:\s*\/\s*\d{1,4}(?:\.\d+)?)+)\s*MVA/i);
@@ -913,6 +937,7 @@ var BL = (function(){
         if(oil || wdg) return { oil: oil ? +oil[1] : null, wdg: wdg ? +wdg[1] : null };
         var us = s.match(/\b(55|65)\s*\/\s*(65)\s*°?\s*C?\b|\b(55|65)\s*°?\s*C\s*(?:average winding )?(?:temperature )?rise|temperature rise\s*[:\-]?\s*(55|65)\s*°\s*C/i);
         if(us) return us[1] ? { us: us[1] + '/' + us[2], wdg: +us[1] } : { us: us[3] || us[4], wdg: +(us[3] || us[4]) };
+        var pl = s.match(/temperature rise[^.;\d]{0,20}?(?<![\d.])(\d{2,3})\s*K\b/i); if(pl && !/oil/i.test(s)) return { oil: null, wdg: +pl[1] };
         return null;
       },
       edit:function(s){ var n = nums(s); return n.length ? { oil: n.length > 1 ? n[0] : null, wdg: n.length > 1 ? n[1] : n[0] } : null; },
@@ -927,6 +952,7 @@ var BL = (function(){
         return { max: mx ? +mx[1] : null, month: mo ? +mo[1] : null, year: yr ? +yr[1] : null, alt: al ? +al[1].replace(/[,.]/, '') : null, altMax: !!al && /not exceed|up to|below|less than|max|≤|under/i.test(al[0] + ' ' + s.slice(Math.max(0, (al.index || 0) - 25), al.index || 0)) };
       },
       more:function(v){ return v.max == null || v.alt == null; }, ctxOk:/ambient|altitude|average|humidity/i,
+      post:function(v, all){ if(v.max != null && v.alt != null) return v; var self = FMAP.ambient, lines = canon(all).split(/\n|[.;]\s/); for(var i = 0; i < lines.length; i++){ if(!/ambient|altitude|above sea level/i.test(lines[i]) || /price|cost/i.test(lines[i])) continue; var w = self.parse(lines[i]); if(!w) continue; ['max','month','year','alt'].forEach(function(k){ if(v[k] == null && w[k] != null){ v[k] = w[k]; if(k === 'alt') v.altMax = w.altMax; } }); } return v; },
       edit:function(s){ var n = nums(s); return n.length ? { max: n[0], month: null, year: null, alt: n.length > 1 ? n[1] : null } : null; },
       show:function(v){ return [v.max != null ? '최고 ' + v.max + ' °C' : '', v.month != null ? '월평균 ' + v.month + ' °C' : '', v.year != null ? '연평균 ' + v.year + ' °C' : '', v.alt != null ? '고도 ' + v.alt + ' m' + (v.altMax ? ' 이하' : '') : ''].filter(Boolean).join(' · '); } },
     { k:'bil', g:'tech', label:'뇌임펄스 내전압 (LI)', en:'Lightning impulse withstand level (LI/BIL)', unit:'kV',
@@ -968,10 +994,10 @@ var BL = (function(){
       edit:function(s){ var n = nums(s); return n.length ? { db: n[0], power: /파워|power/i.test(s) } : null; },
       show:function(v){ return v.db + ' dB(A)' + (v.power ? ' · 음향파워' : ''); } },
     { noCtx: true, k:'standard', g:'tech', label:'적용 표준', en:'Applicable standard',
-      kw:/IEC\s*60076|(IEEE|ANSI)\s*(?:\/\s*IEEE\s*)?C57|(?:conform|comply|accordance|standards?|as per|according to)[^.]{0,60}(?<!ISO\/)\b(?:IEC|IEEE|ANSI)\b(?!\s*17025)|(?<!ISO\/)\b(?:IEC|IEEE|ANSI)\b(?!\s*17025)[^.]{0,30}standards?/i,
-      parse:function(s){ var i = /(?<!ISO\/)\bIEC\b(?!\s*17025)/i.test(s), e = /\b(IEEE|ANSI)\b/i.test(s); return i || e ? { std: i && e ? 'both' : i ? 'IEC' : 'IEEE' } : null; },
+      kw:/IEC\s*60076|(?:AS\s*\/\s*NZS|BS\s*EN|EN|SANS|IS)\s*60076|(IEEE|ANSI)\s*(?:\/\s*IEEE\s*)?C57|(?:conform|comply|accordance|standards?|as per|according to)[^.]{0,60}(?<!ISO\/)\b(?:IEC|IEEE|ANSI)\b(?!\s*17025)|(?<!ISO\/)\b(?:IEC|IEEE|ANSI)\b(?!\s*17025)[^.]{0,30}standards?/i,
+      parse:function(s){ var i = /(?<!ISO\/)\bIEC\b(?!\s*17025)|\b60076\b/i.test(s), e = /\b(IEEE|ANSI)\b/i.test(s); return i || e ? { std: i && e ? 'both' : i ? 'IEC' : 'IEEE' } : null; },
       rank:function(v, c){ return /60076|C57/i.test(c) ? 2 : 1; },
-      post:function(v, all){ var i = /IEC\s*60076/i.test(all), e = /(IEEE|ANSI)\s*(?:\/\s*IEEE\s*)?C57/i.test(all); if(i && e) v.std = 'both'; return v; },
+      post:function(v, all){ var i = /(?:IEC|AS\s*\/\s*NZS|EN)\s*60076/i.test(all), e = /(IEEE|ANSI)\s*(?:\/\s*IEEE\s*)?C57/i.test(all); if(i && e) v.std = 'both'; return v; },
       edit:function(s){ var i = /iec/i.test(s), e = /ieee|ansi/i.test(s); return i || e ? { std: i && e ? 'both' : i ? 'IEC' : 'IEEE' } : null; },
       show:function(v){ return v.std === 'both' ? 'IEC 60076 + IEEE/ANSI C57' : v.std === 'IEC' ? 'IEC 60076' : 'IEEE/ANSI C57.12'; } },
     { k:'lossCap', g:'tech', label:'손실 평가 단가', en:'Loss capitalisation rates',
@@ -1005,13 +1031,15 @@ var BL = (function(){
       parse:function(s){
         var c = s.match(new RegExp('(?:at least|minimum(?: of)?|not less than|no fewer than|a minimum of)\\s+' + NUMW + '(?:\\s*\\((\\d+)\\))?(?![\\d.])(?!\\s*(?:\\(\\d+\\)\\s*)?(?:years|%|percent|MVA|kV|USD|US\\$|million|months|days))', 'i'));
         var y = s.match(new RegExp('(?:last|past|preceding|period of|over|for at least|minimum of|at least)\\s+' + NUMW + '(?:\\s*\\((\\d+)\\))?\\s*years', 'i'));
-        if(c){ var count = toNum(c[1], c[2]); if(count && count <= 200) return { count: count, years: y ? toNum(y[1], y[2]) : null }; }
+        var op = s.match(new RegExp('(?:operation|service|operating)[^.;]{0,20}?(?:for )?(?:at least |a minimum of |not less than )?' + NUMW + '(?:\\s*\\((\\d+)\\))?\\s*years', 'i'));
+        if(op && y && op.index <= y.index + 40 && /operation|service/i.test(s.slice(Math.max(0, y.index - 40), y.index + 5))) y = null;
+        if(c){ var count = toNum(c[1], c[2]); if(count && count <= 200) return { count: count, years: y ? toNum(y[1], y[2]) : null, op: op ? toNum(op[1], op[2]) : null }; }
         if(y && /deliver|supply|supplied|manufactur|experience|record|perform/i.test(s)){ var yy = toNum(y[1], y[2]); if(yy && yy <= 60) return { count: null, years: yy }; }
         return null;
       },
       rank:function(v){ return v.count != null ? 2 : 1; },
       edit:function(s){ var n = nums(s); return n.length ? { count: n[0], years: n.length > 1 ? n[1] : null } : null; },
-      show:function(v){ return v.count == null ? '납품 이력 ' + v.years + '년 이상' : (v.years ? '최근 ' + v.years + '년 ' : '') + '유사 실적 ' + v.count + '건 이상'; } },
+      show:function(v){ return v.count == null ? '납품 이력 ' + v.years + '년 이상' : (v.years ? '최근 ' + v.years + '년 ' : '') + '유사 실적 ' + v.count + '건 이상' + (v.op ? ' (각 ' + v.op + '년 이상 운전)' : ''); } },
     { noCtx: true, k:'iso', g:'cert', label:'ISO 9001', en:'ISO 9001 certification',
       kw:/ISO\s*9001/i,
       parse:function(){ return { required: true }; },
@@ -1038,7 +1066,7 @@ var BL = (function(){
       show:function(v){ return v.weeks ? v.weeks + '주 이내' : v.date ? '지정일 ' + fmtDate(v.date) : '입찰자 제시'; } },
     { k:'incoterms', g:'comm', label:'인코텀즈', en:'Delivery term (Incoterms)',
       kw:/\b(EXW|FCA|FAS|FOB|CFR|CIF|CPT|CIP|DAP|DPU|DDP|DDU)\b/,
-      parse:function(s){ var re = /\b(EXW|FCA|FAS|FOB|CFR|CIF|CPT|CIP|DAP|DPU|DDP|DDU)\b[\s,]*([^.(;\n]{0,40})/g, m, mm; while((mm = re.exec(s))){ if(mm[1] === 'CFR' && (/\d\s*$/.test(s.slice(0, mm.index)) || /^Part\b/i.test(mm[2]))) continue; m = mm; break; } return m ? { term: m[1], place: m[2].replace(/^(at|to)\s+/i, '').replace(/(?:^|\s+)(?:Incoterms?|basis|terms?).*$/i, '').replace(/,\s+(?:of|for|with|within|from|after|and|in)\b.*$/i, '').replace(/\s+(?:within|from|after)\b.*$/i, '').replace(/,\s*\d.*$/, '').replace(/[\s,)\]]+$/, '').replace(/^.*\b(?:transformers?|equipment|goods|price)\b.*$/i, '').replace(/^[-–\s]+/, '').replace(/named place.*$/i, '').trim().replace(/^[^A-Za-z]*$/, '') } : null; },
+      parse:function(s){ var re = /\b(EXW|FCA|FAS|FOB|CFR|CIF|CPT|CIP|DAP|DPU|DDP|DDU)\b[\s,]*([^.(;\n]{0,64})/g, m, mm; while((mm = re.exec(s))){ if(mm[1] === 'CFR' && (/\d\s*$/.test(s.slice(0, mm.index)) || /^Part\b/i.test(mm[2]))) continue; m = mm; break; } return m ? { term: m[1], place: m[2].replace(/^(at|to)\s+/i, '').replace(/(?:^|\s+)(?:Incoterms?|basis|terms?).*$/i, '').replace(/,\s+(?:of|for|with|within|from|after|and|in)\b.*$/i, '').replace(/\s+(?:within|from|after)\b.*$/i, '').replace(/,\s*\d.*$/, '').replace(/[\s,)\]]+$/, '').replace(/^.*\b(?:transformers?|equipment|goods|price)\b.*$/i, '').replace(/^[-–\s]+/, '').replace(/named place.*$/i, '').trim().replace(/^[^A-Za-z]*$/, '').replace(/^(.{40}\S*?)\s.*$/, '$1') } : null; },
       edit:function(s){ var m = String(s).toUpperCase().match(/\b(EXW|FCA|FAS|FOB|CFR|CIF|CPT|CIP|DAP|DPU|DDP)\b/); return m ? { term: m[1], place: String(s).replace(new RegExp(m[0], 'i'), '').replace(/^[\s·,-]+/, '').trim() } : null; },
       show:function(v){ return v.term + (v.place ? ' · ' + v.place : ''); } },
     { k:'ld', g:'comm', label:'지체상금', en:'Liquidated damages',
@@ -1064,7 +1092,7 @@ var BL = (function(){
         var pcts = (s.match(/\d+\s*%/g) || []).map(function(x){ return x.replace(/\s/g, ''); });
         var lc = /letter of credit|\bL\/C\b/i.test(s), tt = /\bT\/T\b|telegraphic transfer|wire transfer|bank transfer/i.test(s);
         var days = (s.match(/(\d+)\s*\)?\s*(?:calendar\s*)?days/i) || s.match(/\bnet\s*(\d+)/i) || [])[1];
-        var parts = []; if(lc) parts.push('신용장(L/C)'); if(tt) parts.push('송금(T/T)'); if(days) parts.push('청구 후 ' + days + '일'); if(pcts.length) parts.push(pcts.join(' / '));
+        var parts = []; if(lc) parts.push('신용장(L/C)'); if(tt) parts.push('송금(T/T)'); if(days) parts.push((/(?:after|from|of)\s+(?:the\s+)?(?:date of\s+)?(?:delivery|shipment|receipt of (?:the )?goods)/i.test(s) && !/invoice/i.test(s) ? '납품 후 ' : /invoice|bill/i.test(s) ? '청구 후 ' : '') + days + '일' + (/invoice|bill|after|from|of delivery/i.test(s) ? '' : ' 이내')); if(pcts.length) parts.push(pcts.join(' / '));
         return parts.length ? { text: parts.join(' · '), lc: lc } : null;
       },
       rank:function(v){ return (v.lc ? 1 : 0) + (v.text.indexOf('%') >= 0 ? 1 : 0); },
@@ -1131,7 +1159,7 @@ var BL = (function(){
     if(!out.clarDeadline && out.bidDeadline){
       for(var j = 0; j < sents.length; j++){
         var cj = sents[j].c; if(!/clarification|quer(?:y|ies)|\bquestions?\b|enquir/i.test(cj)) continue;
-        var rm = cj.match(/(\d{1,3})\s*\)?\s*(?:calendar\s+)?days?\s+(?:prior to|before)\s+(?:the\s+)?(?:deadline|closing|last date|date (?:of|for) (?:bid )?(?:submission|opening))/i);
+        var rm = cj.match(/(\d{1,3})\s*\)?\s*(?:calendar\s+)?days?\s+(?:prior to|before)\s+(?:the\s+)?(?:(?:bid|proposal|tender|quotation|submission)\s+)?(?:deadline|closing|last date|date (?:of|for) (?:bid )?(?:submission|opening))/i);
         if(rm){ var bd = out.bidDeadline.v.date.split('-').map(Number); var dt = new Date(bd[0], bd[1] - 1, bd[2] - +rm[1]); out.clarDeadline = { v: { date: iso(dt), rel: +rm[1] }, page: sents[j].page, quote: sents[j].s, by: 'rule' }; break; }
       }
     }
@@ -1192,7 +1220,7 @@ var BL = (function(){
   function tapTxt(v){ return v.plus != null ? '+' + v.plus + '% / −' + v.minus + '%' : '±' + v.range + '%'; }
   function siteDelivery(all){ var it = all && all.incoterms ? all.incoterms.v : null; return !!it && (/^(DAP|DPU|DDP|DDU)$/.test(it.term) || (it.term === 'FOB' && /destination|site|substation|jobsite/i.test((it.place || '') + ' ' + ((all.incoterms.quote) || '')))); }
   function compare(k, v, std, all){
-    if(!v) return { st: 'ask', note: '문서에서 찾지 못함 · 확인 필요' };
+    if(!v) return { st: 'ask', note: '미기재 · 확인 필요' };
     switch(k){
       case 'employer': case 'rfpNo': case 'currency': case 'payment': case 'quantity': return { st: 'info' };
       case 'lossCap': { var lc = lossCost(v, std), qn = all && all.quantity ? all.quantity.v.n : 1; return lc ? { st: 'info', note: '자사 손실 기준 평가 가산 ≈ ' + fmtMoney(v.cur, lc) + '/대' + (qn > 1 ? ' · ' + qn + '대 ' + fmtMoney(v.cur, lc * qn) : '') } : { st: 'info', note: '손실 보증값 설계 시 반영' }; }
@@ -1307,7 +1335,7 @@ var BL = (function(){
       if(insR && insS && insR !== insS && v && ['cooling','tempRise','ambient','noise','tap'].indexOf(def.k) >= 0) c = { st: 'info', note: (insR === 'dry' ? '건식' : '유입식') + ' 요구 · 제품군이 달라 비교 생략' };
       if(def.k === 'lossCap' && !v) c = { st: 'info', note: '평가 기준 미기재' };
       if(NO_ASK[def.k] && !v) c = { st: 'info', note: '미기재 · IEC 표준 사용 조건 가정' };
-      if((def.k === 'iso' || def.k === 'localAgent') && !v) c = { st: 'info', note: '문서에 언급 없음 · 요구 없음으로 간주' };
+      if((def.k === 'iso' || def.k === 'localAgent') && !v) c = { st: 'info', note: '언급 없음 (요구 없음으로 간주)' };
       if(kind === 'single' && def.k === 'vector' && std) c = { st: 'no', note: '단상 변압기' + (v ? ' (' + v.raw + ')' : '') + ' · 3상 표준품과 구조가 다름', major: true };
       return { def: def, f: f, v: v, c: c };
     });
@@ -1347,23 +1375,24 @@ var BL = (function(){
   }
 
   var LETTER = {
-    ld: function(r){ return 'Liquidated Damages — The rate and maximum cap of liquidated damages for delayed delivery are not stated in the bidding documents' + ref(r) + '. Please confirm the applicable rate and cap.'; },
+    ld: function(r){ return 'Liquidated Damages — The bidding documents do not appear to state the rate and maximum cap of liquidated damages for delayed delivery' + ref(r) + '. Please confirm the applicable rate and cap.'; },
     cooling: function(r, std, an){ var cap = an.fields.capacity ? an.fields.capacity.v : null; var ieeeC = an.fields.standard && an.fields.standard.v.std === 'IEEE'; return 'Cooling — The specification requires ' + (r.v.raw || r.v.codes.join('/')) + (cap ? ' cooling with a rating of ' + (cap.stages ? cap.stages.join('/') : cap.mva) + ' MVA' : ' cooling') + ref(r) + '. Please confirm ' + (cap && cap.stages && cap.stages.length === (r.v.raw || '').split('/').length ? '' : 'the rating required at the ' + (r.v.codes[0] || 'ONAN') + ' stage and ') + 'any overload or emergency loading requirement (' + (ieeeC ? 'IEEE C57.91' : 'IEC 60076-7') + ').'; },
     delivery: function(r, std, an){ var site = siteDelivery(an.fields), wk = std.delivery + (site ? (std.transit || 8) : 0); return 'Delivery Period — The bidding documents require ' + (r.v.weeks ? 'delivery within ' + r.v.weeks + ' weeks' : 'delivery by ' + (r.v.date ? enDate(r.v.date) : 'the specified date')) + ref(r) + '. Please advise whether a delivery period of ' + wk + ' weeks ' + (site ? '(delivered to site, ' + (an.fields.incoterms.v.term === 'FOB' ? 'FOB Destination' : an.fields.incoterms.v.term) + ')' : '(ex-works)') + ', counted from contract effectiveness and receipt of the advance payment, would be considered.'; },
     warranty: function(r, std){ return 'Warranty Period — A warranty of ' + r.v.months + ' months is required' + ref(r) + '. Please advise whether a warranty period of ' + std.warranty + ' months from commissioning or ' + (std.warranty + 12) + ' months from delivery, whichever occurs first, would be acceptable.'; },
     priceAdj: function(r){ return 'Price Adjustment — The contract price is firm and fixed' + ref(r) + '. Given the volatility of raw material prices, please advise whether a price adjustment formula based on published indices (e.g. LME copper cash settlement price, a grain-oriented electrical steel (GOES/CRGO) price index and a labour index), with defined fixed and variable portions, could be accepted.'; },
     capacity: function(r){ return 'Rated Power — The specification requires ' + (r.v.stages ? r.v.stages.join('/') : r.v.mva) + ' MVA' + ref(r) + '. Please confirm the rating at each cooling stage and the expected loading profile (continuous and cyclic loading).'; },
-    impedance: function(r, std, an){ var vg = an.fields.vector ? vecParts(an.fields.vector.v.raw) : null, loaded = vg && vg.ter && !/stabili[sz]|buried/i.test(an.fields.vector.quote || ''); var q = r.f ? r.f.quote : '', hasBase = /\bbase\b|rated power|\d\s*MVA/i.test(q), hasTap = /principal tap|nominal tap|rated tap|middle tap/i.test(q); var ask = [!hasBase ? 'the MVA base (ONAN or final cooling stage rating)' : '', !hasTap ? 'the tap position' : ''].filter(Boolean); if(!ask.length && !loaded) return 'Impedance — The specification requires a short-circuit impedance of ' + r.v.pct + ' %' + ref(r) + '. Please confirm the applicable tolerance (' + (an.fields.standard && an.fields.standard.v.std === 'IEEE' ? 'IEEE C57.12.00' : 'IEC 60076-1') + ') and the impedance values required at the extreme taps, if any.'; return 'Impedance — Please confirm ' + (ask.length ? ask.join(' and ') + ' on which the short-circuit impedance of ' + r.v.pct + ' %' + ref(r) + ' is specified' : 'the impedance requirements' + ref(r)) + (loaded ? ', and the HV-TV and LV-TV impedances of the tertiary winding' : '') + '.'; },
-    standard: function(r, std){ var ours = std && std.standard === 'IEEE' ? 'IEEE C57.12.00' : 'IEC 60076'; return 'Applicable Standard — Our design is in accordance with ' + ours + '. Please confirm whether ' + ours + ' is acceptable, or which clauses of the specified standard' + ref(r) + ' (e.g. insulation levels, sound level, test procedures) are mandatory.'; },
+    impedance: function(r, std, an){ var vg = an.fields.vector ? vecParts(an.fields.vector.v.raw) : null, loaded = vg && vg.ter && !/stabili[sz]|buried/i.test(an.fields.vector.quote || ''); var q = r.f ? r.f.quote : '', hasBase = /\bbase\b|rated power|\d\s*MVA/i.test(q), hasTap = /principal tap|nominal tap|rated tap|middle tap/i.test(q); var ask = [!hasBase ? 'the MVA base (ONAN or final cooling stage rating)' : '', !hasTap ? 'the tap position' : ''].filter(Boolean); if(!ask.length && !loaded) return 'Impedance — The specification requires a short-circuit impedance of ' + r.v.pct + ' %' + ref(r) + '. Please confirm the applicable tolerance (' + (an.fields.standard && an.fields.standard.v.std === 'IEEE' ? 'IEEE C57.12.00' : 'IEC 60076-1') + ') and the impedance values required at the extreme taps, if any.'; return 'Impedance — Please confirm ' + (ask.length ? ask.join(' and ') + ' at which the short-circuit impedance of ' + r.v.pct + ' %' + ref(r) + ' is specified' : 'the impedance requirements' + ref(r)) + (loaded ? ', and the HV-TV and LV-TV impedances of the tertiary winding' : '') + '.'; },
+    standard: function(r, std){ var ours = std && std.standard === 'IEEE' ? 'IEEE C57.12.00' : 'IEC 60076', theirs = r.v.std === 'IEEE' ? 'ANSI/IEEE C57.12.00' : r.v.std === 'IEC' ? 'IEC 60076' : 'the specified standard'; return 'Applicable Standard — The specification requires compliance with ' + theirs + ref(r) + ', while our standard design is in accordance with ' + ours + '. Please confirm whether a design and tests in accordance with ' + ours + ' would be acceptable, or which clauses of ' + theirs + ', e.g. insulation levels, sound level and test procedures, are mandatory.'; },
     noise: function(r, std, an){ var ieee = an.fields.standard && an.fields.standard.v.std === 'IEEE', q = r.f ? r.f.quote : '', stage = /ON?AF|ONAN|OFAF|ODAF|\bOA\b|\bFA\b|cooling|fans?\b/i.test(q), meth = ieee ? 'IEEE C57.12.90 / NEMA TR 1' : 'IEC 60076-10';
       if(r.v.power) return 'Sound Level — The specification limits the A-weighted sound power level to ' + r.v.db + ' dB(A)' + ref(r) + '. Please confirm that the guarantee is to be verified as sound power (LWA) determined from sound pressure measurements in accordance with ' + meth + (stage ? '' : ', and the cooling stage (fans and pumps in or out of service) at which it applies') + '.';
-      return 'Sound Level — The specification limits the sound level to ' + r.v.db + ' dB(A)' + ref(r) + '. Please confirm whether this is the A-weighted sound pressure level (LpA) measured in accordance with ' + meth + (/\b(?:0\.3|2)\s*m\b/.test(q) ? '' : ' and the measurement distance (0.3 m or 2 m)') + (stage ? '' : ', and the cooling stage (fans and pumps in or out of service) at which it applies') + '.'; },
-    tempRise: function(r, std, an){ var a = an.fields.ambient ? an.fields.ambient.v : null; if(a && (a.max != null || a.year != null || a.alt != null)){ var cond = [a.max != null ? 'maximum ambient ' + a.max + ' °C' : '', a.month != null ? 'monthly average ' + a.month + ' °C' : '', a.year != null ? 'yearly average ' + a.year + ' °C' : '', a.alt != null ? 'altitude ' + (a.altMax ? 'up to ' : '') + a.alt + ' m' : ''].filter(Boolean).join(', '); return 'Temperature Rise — Please confirm whether the specified temperature rise limits' + ref(r) + ' already take into account the site conditions (' + cond + '), or whether the correction in accordance with ' + (an.fields.standard && an.fields.standard.v.std === 'IEEE' ? 'IEEE C57.12.00' : 'IEC 60076-2') + ' is to be applied in addition.'; } return 'Temperature Rise — Please confirm the site ambient conditions (maximum, monthly average and yearly average ambient temperature, and altitude) applicable to the specified temperature rise limits' + ref(r) + '.'; },
-    tap: function(r){ return 'Tap Changer — Please confirm the required tapping range' + (r.v.range != null ? ' (' + tapTxt(r.v).replace('−', '-') + ')' : '') + ', the number of positions and whether a specific on-load tap changer make is required' + ref(r) + '.'; },
+      return 'Sound Level — The specification limits the sound level to ' + r.v.db + ' dB(A)' + ref(r) + '. Please confirm whether this is the A-weighted sound pressure level (LpA) measured in accordance with ' + meth + (/\b(?:0\.3|2)\s*m\b/.test(q) ? '' : ', and state the measurement distance (0.3 m or 2 m)') + (stage ? '' : ', and the cooling stage (fans and pumps in or out of service) at which it applies') + '.'; },
+    tempRise: function(r, std, an){ var a = an.fields.ambient ? an.fields.ambient.v : null; if(a && (a.max != null || a.year != null || a.alt != null)){ var cond = [a.max != null ? 'maximum ambient ' + a.max + ' °C' : '', a.month != null ? 'monthly average ' + a.month + ' °C' : '', a.year != null ? 'yearly average ' + a.year + ' °C' : '', a.alt != null ? 'altitude ' + (a.altMax ? 'up to ' : '') + a.alt + ' m' : ''].filter(Boolean).join(', '); var lim = r.v ? [r.v.oil != null ? 'top-oil ' + r.v.oil + ' K' : '', r.v.wdg != null ? 'average winding ' + r.v.wdg + ' K' : ''].filter(Boolean).join(', ') : ''; return 'Temperature Rise — Please confirm whether the specified temperature rise limits' + (lim ? ' (' + lim + ')' : '') + ref(r) + ' already take into account the site conditions (' + cond + '), or whether the correction in accordance with ' + (an.fields.standard && an.fields.standard.v.std === 'IEEE' ? 'IEEE C57.12.00' : 'IEC 60076-2') + ' is to be applied in addition.'; } var lim2 = r.v ? [r.v.oil != null ? 'top-oil ' + r.v.oil + ' K' : '', r.v.wdg != null ? 'average winding ' + r.v.wdg + ' K' : ''].filter(Boolean).join(', ') : ''; return 'Temperature Rise — Please confirm the site ambient conditions (maximum, monthly average and yearly average ambient temperature, and altitude) applicable to the specified temperature rise limits' + (lim2 ? ' (' + lim2 + ')' : '') + ref(r) + '.'; },
+    tap: function(r, std){ if(r.v.range != null && std && std.tapRange && r.v.range > std.tapRange) return 'Tap Changer — The specification requires a tapping range of ' + tapTxt(r.v).replace('−', '-') + ref(r) + '. Please advise whether our standard ' + (std.tapType === 'OLTC' ? 'on-load' : 'off-circuit') + ' tap changer with a range of ±' + std.tapRange + '% would be acceptable, and whether a specific tap changer make is required.'; return 'Tap Changer — Please confirm the required tapping range' + (r.v.range != null ? ' (' + tapTxt(r.v).replace('−', '-') + ')' : '') + (r.v.steps ? '' : ', the number of positions') + ' and whether a specific on-load tap changer make is required' + ref(r) + '.'; },
     typeTest: function(r, std){ return 'Type Test Reports — The bidding documents refer to type test reports issued by ' + (r.v.lab || 'a specified laboratory') + ref(r) + '. Please confirm whether type test reports, including the dynamic short-circuit withstand test per IEC 60076-5, issued by ' + (std.typeLab || 'another') + ', an ISO/IEC 17025-accredited independent laboratory, for a transformer of the same or higher rating would be accepted.'; },
-    bidSecurity: function(r){ return 'Bid Security — The amount or percentage of the bid security is not stated' + ref(r) + '. Please confirm the required amount and acceptable form.'; }
+    bidSecurity: function(r){ return 'Bid Security — The bidding documents do not appear to state the amount or percentage of the bid security' + ref(r) + '. Please confirm the required amount and acceptable form.'; }
   };
-  var MISS_EN = { quantity: 'the number of units required', bil: 'the lightning impulse withstand level (LI/BIL) of each winding', iso: 'any requirement for ISO 9001 certification', localAgent: 'any requirement for a local agent or representative', priceAdj: 'whether the contract price is fixed or subject to price adjustment', payment: 'the payment terms', warranty: 'the required warranty period', incoterms: 'the delivery terms (Incoterms and named place)', insulation: 'the required insulating liquid (mineral oil or natural ester)', standard: 'the applicable standard (IEC 60076 or IEEE C57.12)', noise: 'the sound level limit and measurement method', tempRise: 'the top-oil and average winding temperature rise limits', typeTest: 'the type test report requirements', experience: 'the required supply experience', currency: 'the bid currency', bidSecurity: 'the bid security requirement', clarDeadline: 'the deadline for requests for clarification', bidDeadline: 'the bid submission deadline', vector: 'the vector group', cooling: 'the cooling method', impedance: 'the short-circuit impedance', tap: 'the tap changer requirements', capacity: 'the rated power', voltage: 'the rated voltages', frequency: 'the rated frequency', delivery: 'the required delivery period', ld: 'the liquidated damages rate and cap' };
+  function titleCase(t){ return String(t).replace(/\b([a-z])([a-z]*)/g, function(m, a, b, i){ return i > 0 && /^(?:of|and|the|for|or|to|in)$/.test(m) ? m : a.toUpperCase() + b; }); }
+  var MISS_EN = { quantity: 'the number of units required', bil: 'the lightning impulse withstand level (LI/BIL) of each winding', iso: 'any requirement for ISO 9001 certification', localAgent: 'any requirement for a local agent or representative', priceAdj: 'whether the contract price is fixed or subject to price adjustment', payment: 'the payment terms', warranty: 'the required warranty period', incoterms: 'the delivery terms (Incoterms and named place)', insulation: 'the required insulating liquid (mineral oil or natural ester)', standard: 'the applicable standard (IEC 60076 or IEEE C57.12)', noise: 'the sound level limit and measurement method', tempRise: 'the temperature rise limits (top-oil and average winding, or the winding rise and insulation class for dry-type units)', typeTest: 'the type test report requirements', experience: 'the required supply experience', currency: 'the bid currency', bidSecurity: 'the bid security requirement', clarDeadline: 'the deadline for requests for clarification', bidDeadline: 'the bid submission deadline', vector: 'the vector group', cooling: 'the cooling method', impedance: 'the short-circuit impedance', tap: 'the tap changer requirements', capacity: 'the rated power', voltage: 'the rated voltages', frequency: 'the rated frequency', delivery: 'the required delivery period', ld: 'the liquidated damages rate and cap' };
   function ref(r){ return r.f && r.f.page ? ' (page ' + r.f.page + ')' : ''; }
   var LETTER_ADJ = ['cooling','delivery','warranty','priceAdj','capacity','impedance','standard','ld','noise','tempRise','tap'];
   function letterCandidates(ev){
@@ -1371,20 +1400,22 @@ var BL = (function(){
   }
   function buildLetter(an, ev, std, sel, profile){
     var items = letterCandidates(ev).filter(function(r){ return sel.indexOf(r.def.k) >= 0; });
+    var noSpec = !an.fields.voltage && !an.fields.capacity, specAsk = noSpec ? items.filter(function(r){ return r.def.g === 'tech' && !r.v; }) : [];
+    if(specAsk.length >= 3){ items = items.filter(function(r){ return specAsk.indexOf(r) < 0; }); items.unshift({ def: { k: '_spec', en: 'Technical Specification' }, v: null, f: null, c: {}, spec: specAsk }); }
     var emp = an.fields.employer ? an.fields.employer.v.text : '[Employer]';
     var no = an.fields.rfpNo ? an.fields.rfpNo.v.text : '[Tender reference]';
     var lines = [];
     lines.push('To: Procurement Department, ' + emp);
-    lines.push('Ref: ' + no + (an.title ? ' — ' + an.title : ''));
+    lines.push('Ref: ' + (an.fields.rfpNo ? no + (an.title ? ' — ' + an.title : '') : (an.title || no)));
     lines.push('Subject: Request for Clarification');
     lines.push('');
     lines.push('Dear Sir or Madam,');
     lines.push('');
     lines.push('We thank you for the opportunity to participate in the above tender. In preparing our bid, we respectfully request clarification on the following points:');
     lines.push('');
-    if(!items.length) lines.push('[Select at least one item to include]');
+    if(!items.length) lines.push('(No clarification items selected.)');
     items.forEach(function(r, i){
-      var t = LETTER[r.def.k] && (r.v || r.def.k === 'ld' || r.def.k === 'bidSecurity') && (r.def.k !== 'typeTest' || r.c.st === 'ask') ? LETTER[r.def.k](r, std, an) : (r.def.en + ' — The bidding documents do not appear to state ' + (MISS_EN[r.def.k] || 'the ' + r.def.en.charAt(0).toLowerCase() + r.def.en.slice(1) + ' requirement') + '. Please confirm the applicable requirement.');
+      var t = r.spec ? 'Technical Specification — The documents available to us do not include the technical specification (rated voltages, rated power, frequency and other technical particulars). We would be grateful if you could provide the complete bidding documents, including the technical specifications, schedule of requirements and price schedules.' : LETTER[r.def.k] && (r.v || r.def.k === 'ld' || r.def.k === 'bidSecurity') && (r.def.k !== 'typeTest' || r.c.st === 'ask') ? LETTER[r.def.k](r, std, an) : (titleCase(r.def.en) + ' — The bidding documents do not appear to state ' + (MISS_EN[r.def.k] || 'the ' + r.def.en.charAt(0).toLowerCase() + r.def.en.slice(1) + ' requirement') + '. Please confirm the applicable requirement.');
       lines.push((i + 1) + '. ' + t);
       lines.push('');
     });
@@ -1403,10 +1434,12 @@ var BL = (function(){
     var f = an.fields, items = [];
     var dl = f.bidDeadline ? f.bidDeadline.v.date : null, cd = f.clarDeadline ? f.clarDeadline.v.date : null;
     function add(k, t, due, why){ items.push({ k: k, t: t, due: due, why: why || '' }); }
-    var lc = letterCandidates(ev);
-    if(lc.length) add('clar', '발주처에 질의서 보내기', cd, '질의 항목 ' + lc.length + '건 · ' + lc.map(function(r){ return r.def.label; }).join(', '));
+    // internal work: before the clarification deadline while it is still open, otherwise a week before submission (never in the past)
+    var tIso = iso(today0()), inner = cd && cd >= tIso ? cd : dl ? (function(){ var x = iso(new Date(new Date(dl + 'T00:00:00').getTime() - 7 * DAY)); return x < tIso ? (dl >= tIso ? tIso : dl) : x; })() : cd;
+    var lc = letterCandidates(ev); if(an.letterSel) lc = lc.filter(function(r){ return an.letterSel.indexOf(r.def.k) >= 0; });
+    if(lc.length) add('clar', '발주처에 질의서 보내기', cd, (cd ? '' : '질의 마감일이 없어요 · 가능한 빨리 · ') + '질의 항목 ' + lc.length + '건 · ' + lc.map(function(r){ return r.def.label; }).join(', '));
     var tech = ev.rows.filter(function(r){ return r.def.g === 'tech' && (r.c.st === 'adj' || r.c.st === 'no'); });
-    if(tech.length) add('design', '설계팀에 보완 검토 요청', cd || dl, tech.map(function(r){ return r.def.label + '(' + (r.c.note || STL_KO[r.c.st]) + ')'; }).join(', '));
+    if(tech.length) add('design', '설계팀에 보완 검토 요청', inner, tech.map(function(r){ return r.def.label + ': ' + (r.c.note || STL_KO[r.c.st]); }).join(' / '));
     if(f.localAgent && f.localAgent.v.required) add('agent', '현지 대리인 지정 · 등록 증빙 준비', dl, '제출 전 등록 필수');
     if(f.bidSecurity && !f.bidSecurity.v.none) add('bond', '입찰보증금 은행 보증서 발급', dl, f.bidSecurity.v.text);
     if(f.typeTest && f.typeTest.v.required) add('tt', '형식시험 성적서 사본 준비', dl, (f.typeTest.v.lab ? f.typeTest.v.lab + ' 또는 동등 기관' : '공인 시험기관'));
@@ -1414,9 +1447,9 @@ var BL = (function(){
     if(f.iso && f.iso.v.required) add('iso', 'ISO 9001 인증서 사본 준비', dl, '유효기간 확인');
     add('sheet', '기술 데이터시트 · 손실 보증값 작성', dl, (std && (std.nll || std.ll) ? '보증값 무부하 ' + (std.nll || '-') + ' kW · 부하 ' + (std.ll || '-') + ' kW 기준' + (f.lossCap ? ' (평가 단가 ' + [f.lossCap.v.nl, f.lossCap.v.ll].filter(function(x){ return x != null; }).map(function(x){ return Number(x).toLocaleString('en-US'); }).join(' / ') + ' ' + f.lossCap.v.cur + '/kW)' : '') : f.lossCap ? '평가 단가 ' + FMAP.lossCap.show(f.lossCap.v) : ''));
     add('price', '가격표 작성' + (f.currency ? ' (' + f.currency.v.code + ')' : ''), dl, f.priceAdj && f.priceAdj.v.fixed ? '고정가 계약 · 원자재 가격 위험 반영' : '');
-    add('approve', 'Bid/No-Bid 내부 결재', cd || dl, '');
+    add('approve', 'Bid/No-Bid 내부 결재', inner, '');
     add('submit', '입찰서 제출', dl, f.bidDeadline ? '' : '마감일을 문서에서 찾지 못했어요');
-    return items.map(function(x, i){ x._i = i; return x; }).sort(function(a, b){ return a.due === b.due ? a._i - b._i : !a.due ? 1 : !b.due ? -1 : a.due < b.due ? -1 : 1; });
+    return items.map(function(x, i){ x._i = i; return x; }).sort(function(a, b){ var ua = a.k === 'clar' && !a.due, ub = b.k === 'clar' && !b.due; if(ua !== ub) return ua ? -1 : 1; return a.due === b.due ? a._i - b._i : !a.due ? 1 : !b.due ? -1 : a.due < b.due ? -1 : 1; });
   }
   var STL_KO = { ok: '일치', adj: '조정 필요', no: '불일치', ask: '질의 필요', info: '정보' };
   var VERDICT_KO = { bid: 'Bid (참여 권장)', review: '검토 필요', nobid: 'No-Bid (불참 권장)', closed: '마감 지난 공고', hold: '판단 보류 (정보 부족)' };
@@ -1445,12 +1478,12 @@ var BL = (function(){
     if(ev.kind === 'reactor') L.push('주의: 변압기가 아닌 리액터 입찰 · 표준품 비교 불가'); else if(ev.kind === 'single') L.push('주의: 단상 변압기 입찰 · 3상 표준품과 구조 다름');
     L.push('일정: 제출 ' + (f.bidDeadline ? fmtDate(f.bidDeadline.v.date) + ' (' + ddayText(dday(f.bidDeadline.v.date)) + ')' : '미확인') + ' / 질의 ' + (f.clarDeadline ? fmtDate(f.clarDeadline.v.date) + ' (' + ddayText(dday(f.clarDeadline.v.date)) + ')' : '미확인'));
     var kp = ev.ko.filter(function(r){ return r.def.g === 'tech'; }), kq = ev.ko.filter(function(r){ return r.def.g !== 'tech'; });
-    if(kp.length) L.push('제품군 불일치: ' + kp.map(function(r){ return r.def.label + '(' + r.c.note + ')'; }).join(', '));
-    L.push('자격 결격 사유: ' + (kq.length ? kq.map(function(r){ return r.def.label + '(' + r.c.note + ')'; }).join(', ') : '없음'));
+    if(kp.length) L.push('제품군 불일치: ' + kp.map(function(r){ return r.def.label + ': ' + r.c.note; }).join(' / '));
+    L.push('자격 결격 사유: ' + (kq.length ? kq.map(function(r){ return r.def.label + ': ' + r.c.note; }).join(' / ') : '없음'));
     var no = ev.rows.filter(function(r){ return r.c.st === 'no' && !r.c.ko; });
-    if(no.length) L.push('불일치: ' + no.map(function(r){ return r.def.label + '(' + r.c.note + ')'; }).join(', '));
+    if(no.length) L.push('불일치: ' + no.map(function(r){ return r.def.label + ': ' + r.c.note; }).join(' / '));
     var adj = ev.rows.filter(function(r){ return r.c.st === 'adj'; });
-    if(adj.length) L.push('조정 필요: ' + adj.map(function(r){ return r.def.label + '(' + r.c.note + ')'; }).join(', '));
+    if(adj.length) L.push('조정 필요: ' + adj.map(function(r){ return r.def.label + ': ' + r.c.note; }).join(' / '));
     var ask = ev.rows.filter(function(r){ return r.c.st === 'ask'; });
     if(ask.length) L.push('질의 필요: ' + ask.map(function(r){ return r.def.label; }).join(', '));
     var next = [];
@@ -1521,7 +1554,7 @@ var S = {
   screen: 'intro', view: 'new', currentId: null, tab: 'summary', group: 'all', status: 'all', sel: null, editKey: null, editErr: '',
   pendingDelete: null, pendingStdDelete: null, editingStd: null, pendingReset: false, renaming: false,
   stdChoice: null, aiOn: false, ai: null, aiBusy: false, downloads: null, proc: null, ctl: null, search: '', memMode: false,
-  hq: '', hv: 'all', showBrief: false, paste: false, ocrClaude: true, imgOk: false, imgMax: 0, ocrStop: false
+  hq: '', hv: 'all', hs: 'new', showBrief: false, paste: false, ocrClaude: true, imgOk: false, imgMax: 0, ocrStop: false
 };
 var session = LS.get('bl.session', null);
 var analyses = LS.get('bl.analyses', []);
@@ -1529,6 +1562,10 @@ var stds = LS.get('bl.standards', null) || JSON.parse(JSON.stringify(DEFAULT_STD
 var settings = Object.assign({}, DEFAULT_SETTINGS, LS.get('bl.settings', {}));
 settings.weights = Object.assign({}, DEFAULT_SETTINGS.weights, settings.weights || {});
 settings.thresholds = Object.assign({}, DEFAULT_SETTINGS.thresholds, settings.thresholds || {});
+if(!Array.isArray(stds) || !stds.length) stds = JSON.parse(JSON.stringify(DEFAULT_STDS));
+try { fixStdRefs(); } catch(e){}
+// keep the demo sample's dates current: a returning visitor should not find the sample past its deadline
+try { var smpRef = 0; analyses.forEach(function(a){ if(!a.sample || a.source !== 'sample') return; var cd = a.fields.clarDeadline && a.fields.clarDeadline.v.date; if(!cd || BL.dday(cd) >= 1) return; var pages = BL.sampleRFP(), nf = BL.extract(pages); Object.keys(a.fields).forEach(function(k){ if(a.fields[k] && a.fields[k].by === 'manual' && !/Deadline$/.test(k)) nf[k] = a.fields[k]; }); a.pages = pages; a.fields = nf; a.done = {}; smpRef++; }); if(smpRef) LS.set('bl.analyses', analyses); } catch(e){}
 settings.profile = Object.assign({}, DEFAULT_SETTINGS.profile, settings.profile || {});
 if(!stds.length) stds = JSON.parse(JSON.stringify(DEFAULT_STDS));
 stds = stds.filter(function(x){ return !(x.example && x.id === 'std-229-10'); }).map(function(x){ var d = DEFAULT_STDS.filter(function(y){ return y.id === x.id; })[0]; return x.example && d ? JSON.parse(JSON.stringify(d)) : x; });
@@ -1538,13 +1575,15 @@ if(!stds.some(function(s){ return s.id === settings.defaultStd; })) settings.def
 function saveAll(){
   var ok = LS.set('bl.analyses', analyses);
   if(!ok){
-    var lite = analyses.map(function(a){ var c = Object.assign({}, a); c.pages = []; c.pagesDropped = true; return c; });
-    ok = LS.set('bl.analyses', lite);
-    if(!S.memMode){ S.memMode = true; toast(ok ? '브라우저 저장 공간이 부족해 원문은 이번 세션에만 보관해요.' : '브라우저에 저장할 수 없어요. 이번 세션에서만 유지돼요.'); }
+    // 저장 공간이 부족하면 오래된 분석부터 원문을 빼서 최근 분석의 원문은 최대한 지켜요.
+    var lite = analyses.map(function(a){ return a; }), order = analyses.map(function(a, i){ return i; }).sort(function(x, y){ return (analyses[x].createdAt || 0) - (analyses[y].createdAt || 0); }), dropped = 0;
+    for(var oi = 0; oi < order.length && !ok; oi++){ var ix = order[oi]; if(!lite[ix].pages || !lite[ix].pages.length) continue; var c = Object.assign({}, lite[ix]); c.pages = []; c.pagesDropped = true; lite[ix] = c; dropped++; ok = LS.set('bl.analyses', lite); }
+    if(!S.memMode || S.memDropped !== dropped){ S.memMode = true; S.memDropped = dropped; toast(ok ? '브라우저 저장 공간이 부족해 오래된 분석 ' + dropped + '건의 원문은 이번 세션에만 보관해요. 판정과 값은 그대로 저장돼요.' : '브라우저에 저장할 수 없어요. 이번 세션에서만 유지돼요. 설정의 백업 파일 저장을 이용하세요.'); }
   }
   LS.set('bl.standards', stds); LS.set('bl.settings', settings);
 }
-function getStd(id){ return stds.filter(function(s){ return s.id === id; })[0] || stds[0] || null; }
+function fixStdRefs(){ var ids = {}; stds.forEach(function(x){ ids[x.id] = 1; }); if(!ids[settings.defaultStd] && stds[0]) settings.defaultStd = stds[0].id; analyses.forEach(function(a){ if(!ids[a.stdId]) a.stdId = settings.defaultStd; }); }
+function getStd(id){ return stds.filter(function(s){ return s.id === id; })[0] || stds.filter(function(s){ return s.id === settings.defaultStd; })[0] || stds[0] || null; }
 function current(){ return analyses.filter(function(a){ return a.id === S.currentId; })[0] || null; }
 function evalOf(an){ return BL.evaluate(an, getStd(an.stdId), settings); }
 var VERDICT = { bid: { t: 'Bid · 참여 권장', c: 'v-bid', s: 'st-ok' }, review: { t: '검토 필요', c: 'v-review', s: 'st-adj' }, nobid: { t: 'No-Bid · 불참 권장', c: 'v-nobid', s: 'st-no' }, closed: { t: '마감 지난 공고', c: 'v-closed', s: 'st-info' }, hold: { t: '판단 보류 · 정보 부족', c: 'v-review', s: 'st-ask' } };
@@ -1559,6 +1598,26 @@ function pageLabel(an, n){
   return 'p.' + n;
 }
 function shortName(a){ return a.fields.rfpNo ? a.fields.rfpNo.v.text : a.name; }
+function guessTitle(pages){
+  var lines = [];
+  pages.slice(0, 2).forEach(function(p){ String(p.text || '').split('\n').slice(0, 60).forEach(function(l){ l = l.trim(); if(l.length > 12 && l.length < 140) lines.push(l); }); });
+  var best = null, bs = -99;
+  lines.forEach(function(l, i){
+    var t = l, sc = 0, lab = l.match(/^([A-Za-z][A-Za-z .\/]{1,28}):\s+(.+)$/);
+    if(/\||\.{4,}|_{4,}/.test(l)) return;
+    if(lab){ var ln = lab[1].trim(); if(/^(?:tender|bid|rfp|rfq|rfb|contract|project|package)?\s*(?:title|name|subject|description|for)$/i.test(ln)){ t = lab[2]; sc += 2; } else if(/^(?:scope|quantity|procurement of|supply of|purchase of|item|lot\s*\d*|goods|works|project)$/i.test(ln)){ t = lab[2]; } else return; }
+    if(!/supply|procurement|design|manufactur|transformer|switchgear|substation|reactor|cable|power/i.test(t)) return;
+    if(/(?:transformer|reactor|switchgear|substation|autotransformer)/i.test(t) && /\d\s*(?:kV|MVA|kVA)\b/i.test(t)) sc += 4;
+    else if(/(?:transformer|reactor|switchgear|substation)/i.test(t)) sc += 2;
+    if(/^(?:supply|procurement|design|purchase|provision|furnish)/i.test(t)) sc += 2;
+    if(/\b(?:shall|must|will|invites?|hereby|please|are|is)\b/i.test(t)) sc -= 3;
+    if(/^(?:section|part|volume|chapter|clause|table|page)\b/i.test(t) || /^[\d.()]+\s/.test(t)) sc -= 2;
+    sc -= i * 0.02;
+    if(sc > bs){ bs = sc; best = t; }
+  });
+  return (best || '').trim().replace(/(\d),(\d{1,2})(?!\d)/g, '$1.$2').replace(/[.;:]\s*$/, '');
+}
+function anDate(a){ var d = new Date(a.createdAt || Date.now()); return '분석 ' + d.getFullYear() + '.' + (d.getMonth() + 1) + '.' + d.getDate(); }
 function titleOf(a){ return a.title || a.name; }
 
 /* ---------------- Landing ---------------- */
@@ -1577,10 +1636,10 @@ function renderIntro(){
         '<button type="button" class="btn btn-ghost" data-go="' + goTo + '">' + (logged ? '대시보드로 이동' : '로그인') + '</button></div>' +
       '</nav>' +
       '<div class="hero-copy" id="top">' +
-        '<p class="pill"><span class="dotc pulse"></span>해외 전력청 입찰서 분석 도구</p>' +
+        '<p class="pill"><span class="dotc pulse"></span>해외 전력 입찰서 분석 도구</p>' +
         '<h1>수백 페이지 입찰서,<br>핵심 규격만 먼저 보세요</h1>' +
         '<p class="lede">RFP PDF를 올리면 전압 등급, 절연 방식, 필수 인증, 납기 조건을 표로 정리하고 자사 표준품과 비교해 Bid/No-Bid 판단, 발주처 질의서, 제출 준비 목록까지 만들어 줍니다.</p>' +
-        '<div class="row-c"><button type="button" class="btn btn-cyan btn-lg" data-go="' + goTo + '">' + (logged ? '분석 이어서 하기' : '데모 체험하기') + '</button><a class="btn btn-ghost btn-lg" href="#how">작동 방식 보기</a></div>' +
+        '<div class="row-c"><button type="button" class="btn btn-cyan btn-lg" data-go="' + (logged ? goTo : 'demo') + '">' + (logged ? '분석 이어서 하기' : '데모 체험하기') + '</button><a class="btn btn-ghost btn-lg" href="#how">작동 방식 보기</a></div>' +
         '<div class="trust"><span>✓ 영문 PDF · 스캔 · 사진</span><span>✓ IEC · IEEE 적용 표준 식별</span><span>✓ 모든 값에 원문 페이지</span></div>' +
       '</div>' +
       '<div class="tblock" aria-hidden="true"><span>PROJECT</span><span>BIDLENS</span><span>DWG NO.</span><span>BL-RFP-001</span><span>SCOPE</span><span>POWER TRANSFORMER</span><span>STD.</span><span>IEC 60076 / IEEE C57</span><span>REV.</span><span>C</span></div>' +
@@ -1604,8 +1663,8 @@ function renderIntro(){
         '<div class="prev-rows" aria-label="분석 결과 예시">' +
           '<div class="prow loop" style="animation-delay:0s"><span>정격 전압 <em>154/22.9 kV</em></span><span class="tag tag-ok">일치 · p.5</span></div>' +
           '<div class="prow loop" style="animation-delay:.5s"><span>정격 용량 <em>60 MVA</em></span><span class="tag tag-ok">일치 · p.5</span></div>' +
-          '<div class="prow loop" style="animation-delay:1s"><span>소음 한도 <em>70 dB(A)</em></span><span class="tag tag-adj">조정 필요 · p.7</span></div>' +
-          '<div class="prow loop" style="animation-delay:1.5s"><span>형식시험 <em>KEMA 성적서</em></span><span class="tag tag-ok">일치 · p.4</span></div>' +
+          '<div class="prow loop" style="animation-delay:1s"><span>소음 한도 <em>70 dB(A)</em></span><span class="tag tag-adj">조정 필요 · p.5</span></div>' +
+          '<div class="prow loop" style="animation-delay:1.5s"><span>형식시험 <em>KEMA 성적서</em></span><span class="tag tag-ok">일치 · p.5</span></div>' +
           '<div class="prow loop" style="animation-delay:2s"><span>지체상금 <em>요율 미기재</em></span><span class="tag tag-ask">질의 필요 · p.9</span></div>' +
           '<div class="verdict-row loop" style="animation-delay:2.5s"><span>참여 판정 · ' + sampleVerdict().t + '</span><span class="mono">' + sampleVerdict().score + '점</span></div>' +
         '</div>' +
@@ -1613,7 +1672,7 @@ function renderIntro(){
     '</div>' +
   '</div></div>' +
 
-  '<div class="marquee" aria-label="지원하는 문서와 표준"><div class="track">' + (function(){ var t = '<span>RFP</span><span>·</span><span>Instructions to Bidders</span><span>·</span><span>Bid Data Sheet</span><span>·</span><span>Technical Specification</span><span>·</span><span class="c">IEC 60076</span><span>·</span><span class="c">IEEE C57.12</span><span>·</span><span>Bid Data Sheet · World Bank / ADB</span><span>·</span><span class="c">ANSI C57.12.10</span><span>·</span><span>GCC / SCC</span><span>·</span><span>Price Schedule</span><span>·</span>'; return t + t; })() + '</div></div>' +
+  '<div class="marquee" role="img" aria-label="지원하는 문서와 표준: RFP, 입찰 안내서, 입찰 데이터 시트, 기술 사양서, IEC 60076, IEEE C57.12, 세계은행 · ADB 표준 입찰서, 계약 조건, 가격표"><div class="track" aria-hidden="true">' + (function(){ var t = '<span>RFP</span><span>·</span><span>Instructions to Bidders</span><span>·</span><span>Bid Data Sheet</span><span>·</span><span>Technical Specification</span><span>·</span><span class="c">IEC 60076</span><span>·</span><span class="c">IEEE C57.12</span><span>·</span><span>World Bank / ADB SBD</span><span>·</span><span class="c">ANSI C57.12.10</span><span>·</span><span>GCC / SCC</span><span>·</span><span>Price Schedule</span><span>·</span>'; return t + t; })() + '</div></div>' +
 
   '<section class="sec"><div class="wrap split">' +
     '<div class="photo"><img src="photos/desk.jpg" alt="야간에 입찰 사양서와 도면을 검토하는 엔지니어" loading="lazy"><div class="cap">기술 사양서 · 데이터 시트 · 계약 조건서</div></div>' +
@@ -1635,8 +1694,8 @@ function renderIntro(){
       feat('<path d="M12 3l9 16H3z"></path><path d="M12 10v4M12 17h.01"></path>', '결격 사유 · 스코어카드', '성적서, 실적, ISO, 마감 경과를 먼저 거르고 가중치를 조정할 수 있는 점수로 참여 여부를 제안합니다.', '요약') +
       feat('<rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M4 7l8 6 8-6"></path>', '영문 질의서 초안', '미기재 · 조정 항목을 골라 발주처에 보낼 Clarification 레터를 만들고 복사하거나 저장합니다.', '질의서') +
       feat('<path d="M9 11l3 3 8-8"></path><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"></path>', '제출 준비 체크리스트', '보증서, 성적서, 실적 증명, 질의서 발송 같은 할 일을 마감일과 함께 자동으로 만들어 진행 상황을 관리합니다.', '제출 준비') +
-      feat('<path d="M4 6h16M4 12h10M4 18h7"></path>', '보고용 요약 한 번에 복사', '판정, 점수, 마감, 결격 사유, 다음 할 일을 메신저 · 메일에 바로 붙여넣을 수 있는 요약으로 만들어 줍니다.', '요약') +
-      feat('<path d="M12 4v12M7 11l5 5 5-5M4 20h16"></path>', '엑셀 · CSV 내보내기', '요약, 규격 비교표, 체크리스트, 질의서를 시트별로 정리한 엑셀 파일로 내려받습니다.', '내보내기') +
+      feat('<path d="M12 4v12M7 11l5 5 5-5M4 20h16"></path>', '보고용 요약 · 엑셀 내보내기', '판정 · 마감 · 결격 사유를 메신저에 붙여넣을 요약으로 복사하고, 비교표 · 체크리스트 · 질의서를 엑셀로 내려받습니다.', '요약 · 내보내기') +
+      feat('<circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"></path>', '해외 전력 입찰 공고 모아보기', '세계은행 · EU 공공조달의 변압기 · 변전소 · 송배전 입찰을 마감 순으로 모아 보고, 공고를 바로 분석하거나 입찰 일정에 추가합니다.', '해외 공고') +
     '</div>' +
   '</div></section>' +
 
@@ -1656,8 +1715,8 @@ function renderIntro(){
   '<section class="sec"><div class="wrap split" style="align-items:flex-start;gap:56px">' +
     '<div style="flex:1 1 300px"><p class="eyebrow">추출 항목</p><h2 class="h2">이런 항목을<br>뽑아냅니다</h2><p class="sub" style="margin-top:18px">찾지 못한 항목은 빈칸이 아닌 "질의 필요"로 표시하고 질의서 작성 대상으로 넘깁니다. 잘못 읽은 값은 결과 화면에서 바로 고칠 수 있어요.</p></div>' +
     '<div class="fields" style="flex:2 1 560px">' +
-      '<div><h3>입찰 기본정보</h3><p>발주처 · 입찰번호<br>제출 마감 · 질의 마감<br>입찰보증금 · 견적 통화</p></div>' +
-      '<div><h3>기술 규격</h3><p>정격 전압 · 용량 · 주파수 · 결선<br>절연 매체 · 냉각 방식 · 온도상승<br>LI(BIL) · %Z · 탭 절환기 · 소음<br>적용 표준 · 손실 평가 단가</p></div>' +
+      '<div><h3>입찰 기본정보</h3><p>발주처 · 입찰번호 · 수량<br>제출 마감 · 질의 마감<br>입찰보증금 · 견적 통화</p></div>' +
+      '<div><h3>기술 규격</h3><p>정격 전압 · 용량 · 주파수 · 결선<br>절연 매체 · 냉각 방식 · 온도상승<br>설치 환경(주위온도 · 고도)<br>LI(BIL) · %Z · 탭 절환기 · 소음<br>적용 표준 · 손실 평가 단가</p></div>' +
       '<div><h3>인증 · 자격</h3><p>형식시험 성적서<br>유사 납품 실적<br>ISO 9001 · 현지 대리인</p></div>' +
       '<div><h3>상업 조건</h3><p>납기 · 인코텀즈<br>지체상금 · 지불 조건<br>보증기간 · 가격조정</p></div>' +
     '</div>' +
@@ -1691,18 +1750,18 @@ function renderIntro(){
   '<section class="sec band" id="faq"><div class="wrap">' +
     '<div class="center" style="margin-bottom:40px"><p class="eyebrow">FAQ</p><h2 class="h2">자주 묻는 질문</h2></div>' +
     '<div class="faq">' +
-      '<details open><summary>어떤 문서를 올릴 수 있나요?</summary><p>영문 PDF(RFP 본문, 입찰 안내서, 기술 사양서, 계약 조건서)를 여러 개 한 번에 올릴 수 있어요. 스캔 PDF나 공고문을 찍은 사진(JPG · PNG)은 글자가 없는 쪽만 골라 글자 인식(OCR)을 해요. Claude 앱에서 열면 Claude가 페이지 이미지를 원문 그대로 받아 적고, 그 밖에서는 브라우저 OCR을 시도해요. "one half of one percent", "forty-five (45) days"처럼 영어 단어로 쓴 숫자도 읽어요.</p></details>' +
-      '<details><summary>업로드한 파일은 어디에 저장되나요?</summary><p>PDF는 서버로 보내지 않고 지금 쓰는 브라우저 안에서 읽어요. 분석 결과도 이 브라우저에만 저장됩니다. Claude 보완을 켜거나 스캔 쪽을 Claude가 읽을 때만 해당 텍스트나 페이지 이미지가 Claude로 전달돼요.</p></details>' +
+      '<details open><summary>어떤 문서를 올릴 수 있나요?</summary><p>영문 PDF(RFP 본문, 입찰 안내서, 기술 사양서, 계약 조건서)를 여러 개 한 번에 올릴 수 있어요. 스캔 PDF나 공고문을 찍은 사진(JPG · PNG)은 글자가 없는 쪽만 골라 글자 인식(OCR)을 해요. 브라우저에서 글자 인식을 시도하고, Claude 앱 안에서 열었을 때는 Claude가 페이지 이미지를 원문 그대로 받아 적어요. "one half of one percent", "forty-five (45) days"처럼 영어 단어로 쓴 숫자도 읽어요.</p></details>' +
+      '<details><summary>업로드한 파일은 어디에 저장되나요?</summary><p>PDF는 서버로 보내지 않고 지금 쓰는 브라우저 안에서 읽어요. 분석 결과도 이 브라우저에만 저장됩니다. Claude 앱 안에서 AI 보완이나 스캔 인식을 쓸 때만 해당 텍스트나 페이지 이미지가 Claude로 전달돼요.</p></details>' +
       '<details><summary>추출 결과를 믿어도 되나요?</summary><p>모든 값에 원문 페이지와 문장을 함께 보여주고, 같은 항목이 여러 번 나오면 다른 후보 값도 보여줘요. 잘못 읽은 값은 직접 고치면 판정이 다시 계산됩니다. 최종 결정은 담당자가 합니다.</p></details>' +
       '<details><summary>나라마다 표기가 다른데 다 읽나요?</summary><p>미국 · 중남미 · 중동 · 남아시아 · 아프리카 전력청 실제 입찰 공고 16건으로 점검했어요. "115,000 volts", "40,000 kVA", "OA/FA/FA", "F.O.B.", 3/13/2026 같은 미국식 표기, "$7,500 per kW" 손실 평가, 세계은행 · ADB 표준 입찰서의 Bid Data Sheet 문형, "제출 마감 21일 전" 같은 상대 날짜도 읽어요. 마감이 지난 공고는 "마감 지난 공고"로 따로 표시해요.</p></details>' +
-      '<details><summary>자사 표준품은 어떻게 등록하나요?</summary><p>자사 표준품 메뉴에서 전압, 용량, 냉각 방식, 보유 인증, 표준 납기 등을 입력해 추가합니다. 여러 개를 등록해 두고 분석마다 비교 기준을 바꿀 수 있어요.</p></details>' +
+      '<details><summary>자사 표준품은 어떻게 등록하나요?</summary><p>자사 표준품 메뉴에서 전압, 용량, 냉각 방식, 보유 인증, 표준 납기 등을 입력해 추가합니다. 여러 개를 등록해 두고 분석마다 비교 기준을 바꿀 수 있어요.</p></details><details><summary>실제 해외 입찰 공고도 볼 수 있나요?</summary><p>앱의 "해외 공고" 메뉴에서 세계은행 · EU 공공조달(TED)에 올라온 변압기 · 변전소 · 개폐기 · 송배전 입찰 중 마감 전인 공고를 모아 보여줘요. 배포한 사이트는 6시간마다 새 공고를 받아오고, 세계은행 공고는 원문을 바로 분석하거나 입찰 일정에 추가할 수 있어요.</p></details>' +
     '</div>' +
   '</div></section>' +
 
   '<section class="sec"><div class="wrap"><div class="cta"><img src="photos/substation.jpg" alt="" loading="lazy"><div class="scrim" aria-hidden="true"></div><div class="in"><h2 class="h2">다음 입찰서부터 바로 써보세요</h2><p>샘플 입찰서로 분석 결과를 먼저 체험할 수 있습니다.</p><button type="button" class="btn btn-cyan btn-lg" data-go="' + goTo + '">' + (logged ? '대시보드로 이동' : '로그인하고 시작하기') + '</button></div></div></div></section>' +
 
   '<footer class="foot"><div class="wrap">' +
-    '<div class="top"><div style="max-width:340px"><a class="brand" href="#top" style="font-size:17px">' + LOGO + 'BidLens</a><p style="color:var(--on-dark-4);font-size:14px;line-height:1.7;margin-top:10px">영문 전력 입찰서 핵심 규격 추출기</p></div>' +
+    '<div class="top"><div style="max-width:340px"><a class="brand" href="#top" style="font-size:17px">' + LOGO + 'BidLens</a><p style="color:var(--on-dark-4);font-size:14px;line-height:1.7;margin-top:10px">해외 전력 입찰서 분석 도구</p></div>' +
     '<div class="cols"><div><span>서비스</span><a href="#features">주요 기능</a><a href="#how">작동 방식</a></div><div><span>안내</span><a href="#usecase">활용 사례</a><a href="#faq">FAQ</a></div></div></div>' +
     '<div class="bot">무역 AX 포트폴리오 프로젝트 · 로그인은 데모 계정이며 데이터는 이 브라우저에만 저장됩니다 · 샘플 입찰서는 가상의 문서입니다</div>' +
   '</div></footer>' +
@@ -1720,7 +1779,7 @@ function renderLogin(){
   '<div class="in wrap"><div style="width:100%;max-width:440px">' +
     '<button type="button" class="btn btn-ghost" data-go="intro" style="margin-bottom:24px">← 서비스 소개로</button>' +
     '<form class="login-card" id="loginForm" novalidate>' +
-      '<div class="brand" style="margin-bottom:8px">' + LOGO + 'BidLens</div>' +
+      '<h1 class="brand" style="margin:0 0 8px;font-size:inherit">' + LOGO + 'BidLens<span class="sr"> 로그인</span></h1>' +
       '<p class="muted-d" style="margin-bottom:24px">회사 이메일로 로그인하세요</p>' +
       '<div class="field"><label for="lgName">이름</label><input class="dinput" id="lgName" autocomplete="name" placeholder="홍길동" value="' + esc(settings.profile.name) + '"></div>' +
       '<div class="field"><label for="lgEmail">회사 이메일</label><input class="dinput" id="lgEmail" type="email" autocomplete="email" placeholder="name@company.com" value="' + esc(settings.profile.email) + '"></div>' +
@@ -1762,21 +1821,25 @@ function seedSample(){
 /* ---------------- App shell ---------------- */
 function go(screen){
   S.screen = screen; var th = $('#themer'); if(th) th.hidden = true;
+  if(screen !== 'app'){ try { sessionStorage.removeItem('bl.inapp'); } catch(e){} }
   if(screen === 'intro') renderIntro();
   else if(screen === 'login') renderLogin();
   else {
     if(!session){ S.screen = 'login'; renderLogin(); return; }
     if(!analyses.length){ seedSample(); saveAll(); }
+    if(!S.enteredApp){ S.enteredApp = true; if(S.view === 'new') loadNav(localStorage); }
     if(!current() && analyses[0]) S.currentId = analyses[0].id;
-    renderApp();
+    renderApp(); try { if(history.state && history.state.bl) history.replaceState({ bl: 1, v: S.view }, ''); else history.pushState({ bl: 1, v: S.view }, ''); S.navFresh = true; setTimeout(function(){ S.navFresh = false; }, 0); } catch(e){}
   }
 }
-var NAV = [ ['new','새 분석'], ['result','분석 결과'], ['history','분석 이력'], ['schedule','입찰 일정'], ['standards','자사 표준품'], ['settings','설정'] ];
+var NAV = [ ['new','새 분석'], ['result','분석 결과'], ['history','분석 이력'], ['schedule','입찰 일정'], ['live','해외 공고'], ['standards','자사 표준품'], ['settings','설정'] ];
 function upcoming(){
   var list = [], seen = {};
   analyses.forEach(function(a){
     ['clarDeadline','bidDeadline'].forEach(function(k){ var f = a.fields[k]; if(!f) return; var key = shortName(a) + '|' + k + '|' + f.v.date; if(seen[key]) return; seen[key] = 1; list.push({ a: a, k: k, n: BL.dday(f.v.date), date: f.v.date }); });
   });
+  var analyzed = {}; analyses.forEach(function(a){ if(a.liveId) analyzed[a.liveId] = 1; });
+  watched.forEach(function(w){ if(!analyzed[w.id]) list.push({ w: w, k: 'watch', n: BL.dday(w.deadline), date: w.deadline }); });
   return list.sort(function(x, y){ var ax = x.n < 0 ? 100000 - x.n : x.n, ay = y.n < 0 ? 100000 - y.n : y.n; return ax - ay; });
 }
 function renderApp(){
@@ -1792,16 +1855,20 @@ function renderRail(){
     '<a class="brand" href="#" data-go="intro" title="서비스 소개 보기">' + LOGO + 'BidLens</a>' +
     '<button type="button" class="new" data-view="new">+ 새 분석</button>' +
     '<nav aria-label="앱 메뉴">' + NAV.map(function(n){
-      var cnt = n[0] === 'history' ? analyses.length : n[0] === 'standards' ? stds.length : n[0] === 'schedule' ? (upcoming().filter(function(u){ return u.n >= 0; }).length || '') : '';
+      var cnt = n[0] === 'history' ? analyses.length : n[0] === 'standards' ? stds.length : n[0] === 'schedule' ? (upcoming().filter(function(u){ return u.n >= 0; }).length || '') : n[0] === 'live' ? (LIVE.data ? LIVE.data.items.length : '') : '';
       var cur = S.view === n[0] || (S.view === 'processing' && n[0] === 'new');
-      return '<button type="button" data-view="' + n[0] + '"' + (cur ? ' aria-current="page"' : '') + '><span>' + n[1] + '</span><span class="cnt">' + cnt + '</span></button>';
+      return '<button type="button" data-view="' + n[0] + '"' + (cur ? ' aria-current="page"' : '') + '><span>' + n[1] + '</span><span class="cnt">' + (cnt !== '' ? '<span class="sr"> </span>' + cnt + '<span class="sr">' + (n[0] === 'standards' ? '개' : '건') + '</span>' : '') + '</span></button>';
     }).join('') + '</nav>' +
     '<p class="lbl">다가오는 마감</p>' +
-    '<div class="up">' + (up.length ? up.map(function(u){ return '<button type="button" data-open="' + u.a.id + '" data-open-tab="' + (u.k === 'clarDeadline' ? 'letter' : 'prep') + '">' + ddChip(u.n) + ' ' + (u.k === 'bidDeadline' ? '제출' : '질의') + '<span class="up-n">' + esc(titleOf(u.a)) + '</span></button>'; }).join('') : '<span style="color:var(--on-dark-4)">예정된 마감이 없어요</span>') + '</div>' +
+    '<div class="up">' + (up.length ? up.map(function(u){ if(u.w) return '<button type="button" data-view="live">' + ddChip(u.n) + ' 해외 공고<span class="up-n">' + esc(u.w.title) + '</span></button>'; return '<button type="button" data-open="' + u.a.id + '" data-open-tab="' + (u.k === 'clarDeadline' ? 'letter' : 'prep') + '">' + ddChip(u.n) + ' ' + (u.k === 'bidDeadline' ? '제출' : '질의') + '<span class="up-n">' + esc(titleOf(u.a)) + '</span></button>'; }).join('') : '<span style="color:var(--on-dark-4)">예정된 마감이 없어요</span>') + '</div>' +
     '<div class="user"><b>' + esc(settings.profile.name || session.name) + '</b><span>' + esc(session.email) + '</span><div class="row"><button type="button" data-go="intro">서비스 소개</button><button type="button" id="logoutBtn">로그아웃</button></div></div>';
 }
 function centerNav(){ if(window.innerWidth > 860) return; var a = $('.rail nav [aria-current="page"]'); var nav = $('.rail nav'); if(a && nav) nav.scrollLeft = a.offsetLeft - nav.clientWidth / 2 + a.offsetWidth / 2; }
-function setView(v){ S.view = v; S.editKey = null; S.pendingDelete = null; S.pendingStdDelete = null; S.pendingReset = false; S.renaming = false; renderRail(); renderMain(); var m = $('#main'); if(m) m.focus({ preventScroll: true }); window.scrollTo(0, 0); }
+function pushNav(){ if(S.popping) return; try { var st = history.state; if(st && st.bl && (st.v === S.view || S.navFresh)) history.replaceState({ bl: 1, v: S.view }, ''); else history.pushState({ bl: 1, v: S.view }, ''); } catch(e){} }
+window.addEventListener('popstate', function(e){ var st = e.state; if(!session) return; S.popping = true; try { if(st && st.bl){ if(S.screen !== 'app') go('app'); if(st.v === 'result' && !current()) st.v = 'history'; setView(st.v); } else if(S.screen === 'app'){ go('intro'); } } finally { S.popping = false; } });
+function saveNav(){ var nv = JSON.stringify({ v: S.view === 'processing' ? 'new' : S.view, t: S.tab, id: S.currentId }); try { sessionStorage.setItem('bl.nav', nv); sessionStorage.setItem('bl.inapp', '1'); } catch(e){} try { localStorage.setItem('bl.nav', nv); } catch(e){} }
+function loadNav(store){ try { var n = JSON.parse(store.getItem('bl.nav') || 'null'); if(!n) return false; var VS = ['new','result','history','schedule','live','standards','settings']; if(VS.indexOf(n.v) < 0) return false; if(n.id && analyses.some(function(a){ return a.id === n.id; })) S.currentId = n.id; if(n.v === 'result' && !current()) return false; S.view = n.v; if(n.t) S.tab = n.t; return true; } catch(e){ return false; } }
+function setView(v){ S.view = v; pushNav(); S.editKey = null; S.pendingDelete = null; S.pendingStdDelete = null; S.pendingReset = false; S.renaming = false; renderRail(); renderMain(); var m = $('#main'); if(m) m.focus({ preventScroll: true }); window.scrollTo(0, 0); }
 function renderMain(){
   var m = $('#main'); if(!m) return; centerNav();
   var html = '';
@@ -1811,15 +1878,41 @@ function renderMain(){
   else if(S.view === 'history') html = viewHistory();
   else if(S.view === 'standards') html = viewStandards();
   else if(S.view === 'schedule') html = viewSchedule();
+  else if(S.view === 'live') html = viewLive();
   else if(S.view === 'settings') html = viewSettings();
+  var fm = focusMemo(m);
   m.innerHTML = html;
   afterRender();
+  restoreFocus(m, fm);
+  if(S.screen === 'app') saveNav();
+}
+// keep keyboard focus near where it was after a re-render (otherwise it falls back to <body> = top of page)
+function focusMemo(m){
+  var ae = document.activeElement; if(!ae || ae === document.body || !m.contains(ae) || ae === m) return null;
+  var own = [], vals = [];
+  for(var el = ae; el && el !== m; el = el.parentElement){ Object.keys(el.dataset || {}).forEach(function(k){ var v = el.dataset[k]; if(el === ae) own.push([k, v]); if(v && v !== 'true' && v !== 'false' && vals.indexOf(v) < 0) vals.push(v); }); if(el.id && el !== ae) vals.push('#' + el.id); }
+  return { id: ae.id, own: own, vals: vals };
+}
+var FOCUS_ALIAS = { '#renameForm': '[data-act="rename"]' };
+function restoreFocus(m, fm){
+  var ae = document.activeElement; if(ae && ae !== document.body && document.contains(ae)) { S.focusTo = null; return; }
+  var cand = null, ctl = 'button,a[href],input,select,textarea,[tabindex]';
+  if(S.focusTo){ cand = $(S.focusTo); S.focusTo = null; }
+  if(!cand && S.view === 'standards' && S.editingStd) cand = $('#sfName');
+  if(!cand && fm){
+    if(fm.id) cand = document.getElementById(fm.id);
+    if(!cand && fm.own.length) cand = $$(ctl).filter(function(x){ return m.contains(x) && fm.own.every(function(p){ return x.dataset[p[0]] === p[1]; }); })[0] || null;
+    if(!cand) fm.vals.some(function(v){ if(FOCUS_ALIAS[v]){ cand = $(FOCUS_ALIAS[v]); return !!cand; } if(v.charAt(0) === '#') return false; var hits = $$(ctl).filter(function(x){ return m.contains(x) && Object.keys(x.dataset).some(function(k){ return x.dataset[k] === v; }); }); cand = hits.filter(function(x){ return 'edit' in x.dataset || 'editGo' in x.dataset || 'sedit' in x.dataset; })[0] || hits[0] || null; return !!cand; });
+  }
+  if(!cand && fm) cand = m;
+  if(cand){ try { cand.focus({ preventScroll: true }); } catch(e){} }
 }
 
 /* ---------------- New analysis ---------------- */
 function pickStd(fields){
   var v = fields.voltage && fields.voltage.v, c = fields.capacity && fields.capacity.v, ins = fields.insulation && fields.insulation.v, fq = fields.frequency && fields.frequency.v;
   if(!v && !c) return settings.defaultStd;
+  if(!ins && fields.cooling){ var cc = fields.cooling.v.codes || []; if(cc.some(function(x){ return /^(?:ON|OF|OD|KN|KF)/.test(x); })) ins = { type: 'oil' }; else if(cc.length && cc.every(function(x){ return /^A[NF]$/.test(x); })) ins = { type: 'dry' }; }
   var best = null, bs = -1e9;
   stds.forEach(function(s){
     var sc = 0;
@@ -1837,7 +1930,7 @@ function viewNew(){
   var choice = S.stdChoice || 'auto';
   var recent = analyses.slice(0, 4);
   var counts = {}; BL.FIELDS.forEach(function(f){ counts[f.g] = (counts[f.g] || 0) + 1; });
-  var guide = settings.onboarded ? '' : '<div class="card pad guide" style="margin-top:20px"><div class="between" style="align-items:center"><p style="font-weight:600">처음 쓰신다면 이 순서로 해 보세요</p><button type="button" class="linkbtn" data-act="guideOff" style="font-family:var(--f-sans);font-size:13px">다시 보지 않기</button></div>' +
+  var guide = settings.onboarded || analyses.some(function(a){ return !a.sample; }) ? '' : '<div class="card pad guide" style="margin-top:20px"><div class="between" style="align-items:center"><p style="font-weight:600">처음 쓰신다면 이 순서로 해 보세요</p><button type="button" class="linkbtn" data-act="guideOff" style="font-family:var(--f-sans);font-size:13px">다시 보지 않기</button></div>' +
     '<ol class="guide-steps"><li><b>자사 표준품 확인</b><span>비교 기준이 될 우리 제품 사양(전압 · 용량 · 손실 · 납기)을 맞춰 두면 판정이 정확해져요.</span><button type="button" class="btn-a btn-sm" data-view="standards">표준품 보기</button></li>' +
     '<li><b>입찰서 올리기</b><span>RFP 본문 · 사양서 · 계약 조건서를 함께 올리거나 샘플로 먼저 체험해 보세요.</span><button type="button" class="btn-a btn-sm" data-act="sample">샘플로 분석</button></li>' +
     '<li><b>판정 확인 · 질의서 발송</b><span>요약에서 결격 사유와 확인할 항목을 보고, 질의서와 제출 준비 목록으로 이어가요.</span><button type="button" class="btn-a btn-sm" data-view="result">샘플 결과 보기</button></li></ol></div>';
@@ -1853,7 +1946,7 @@ function viewNew(){
           '<button type="button" class="btn-a" data-act="sample">샘플 입찰서로 분석해 보기</button>' +
           '<button type="button" class="btn-a" data-act="togglePaste" aria-expanded="' + (S.paste ? 'true' : 'false') + '">텍스트 붙여넣기</button>' +
         '</div>' +
-        '<p class="hint" style="margin-top:14px">파일은 이 브라우저 안에서 읽어요 · Claude 앱에서는 스캔 글자 인식과 빠진 항목 보완에 한해 해당 쪽을 Claude에 보내요 · 최대 60MB</p>' +
+        '<p class="hint" style="margin-top:14px">파일은 이 브라우저 안에서 읽어요' + (S.ai ? ' · 스캔 글자 인식과 빠진 항목 보완에 한해 해당 쪽을 Claude에 보내요' : ' · 서버로 보내지 않아요') + ' · 최대 60MB</p>' +
       '</div>' +
       (S.paste ? '<div class="card pad"><label class="alabel" for="pasteName">문서 이름</label><input class="ainput" id="pasteName" placeholder="예: KEPCO-2026-1102 Tender" style="margin-bottom:12px"><label class="alabel" for="pasteText">입찰서 텍스트</label><textarea class="atext" id="pasteText" placeholder="PDF에서 복사한 영문 텍스트를 붙여넣으세요. 페이지 구분은 [[PAGE 3]] 표시나 빈 줄 두 개로 할 수 있어요."></textarea><p class="err" id="pasteErr" role="alert" style="color:var(--no);margin-top:6px"></p><div class="gap8" style="margin-top:8px"><button type="button" class="btn-a blue" data-act="runPaste">이 텍스트로 분석</button></div></div>' : '') +
       '<div class="card"><div class="between pad" style="padding-bottom:6px"><p style="font-weight:600">최근 분석</p><button type="button" class="linkbtn" data-view="history" style="font-family:var(--f-sans);font-size:14px">전체 보기</button></div>' +
@@ -1862,19 +1955,19 @@ function viewNew(){
     '</div>' +
     '<div style="flex:1 1 280px" class="card pad stack">' +
       '<p style="font-weight:600">분석 설정</p>' +
-      '<div><label class="alabel" for="stdSel">비교 기준 표준품</label><select class="aselect" id="stdSel">' + stdOptions(choice, true) + '</select><p class="hint">결과 화면에서도 바꿀 수 있어요. <button type="button" class="linkbtn" data-view="standards" style="font-family:var(--f-sans);font-size:12.5px;padding:0;min-height:0">표준품 관리</button></p></div>' +
+      '<div><label class="alabel" for="stdSel">비교 기준 표준품</label><select class="aselect" id="stdSel">' + stdOptions(choice, true) + '</select><p class="hint">결과 화면에서도 바꿀 수 있어요. <button type="button" class="linkbtn" data-view="standards" style="font-family:var(--f-sans);font-size:12.5px;padding:4px 0;min-height:32px">표준품 관리</button></p></div>' +
       '<div style="border-top:1px solid #EDF2F8;padding-top:14px">' +
         (S.ai ? '<label class="chk" for="aiChk"><input id="aiChk" type="checkbox"' + (S.aiOn ? ' checked' : '') + '>Claude로 빠진 항목 보완</label><p class="hint">규칙으로 못 찾은 항목을 Claude가 문서를 읽고 채워요. 원문에 그 문장이 실제로 있을 때만 반영해요. 처음 쓸 때 허용을 묻고, 내 Claude 사용량을 씁니다.</p>'
-              : '<p style="font-size:14px;font-weight:500">추출 방식 · 규칙 기반</p><p class="hint">문장 · 표 패턴으로 항목을 찾아요. AI 보완 읽기(선택)는 Claude와 연결된 화면에서 켤 수 있어요.</p>') +
+              : '<p style="font-size:14px;font-weight:500">추출 방식 · 규칙 기반</p><p class="hint">문장 · 표 패턴으로 항목을 찾아요. 찾지 못한 항목은 결과 화면에서 직접 입력할 수 있어요.</p>') +
       '</div>' +
-      '<div style="border-top:1px solid #EDF2F8;padding-top:14px">' + (S.ai && S.imgOk ? '<label class="chk" for="ocrChk"><input id="ocrChk" type="checkbox"' + (S.ocrClaude ? ' checked' : '') + '>스캔 페이지 · 사진은 Claude가 읽기</label><p class="hint">글자가 없는 스캔 쪽만 이미지로 보내 원문 그대로 받아 적게 해요. 끄면 브라우저 OCR을 먼저 시도해요.</p>' : '<p style="font-size:14px;font-weight:500">스캔 PDF · 사진 · 브라우저 OCR</p><p class="hint">글자가 없는 쪽은 브라우저에서 글자 인식(OCR)을 시도해요. Claude와 연결된 화면에서는 AI가 더 정확하게 읽어요.</p>') + '</div>' +
+      '<div style="border-top:1px solid #EDF2F8;padding-top:14px">' + (S.ai && S.imgOk ? '<label class="chk" for="ocrChk"><input id="ocrChk" type="checkbox"' + (S.ocrClaude ? ' checked' : '') + '>스캔 페이지 · 사진은 Claude가 읽기</label><p class="hint">글자가 없는 스캔 쪽만 이미지로 보내 원문 그대로 받아 적게 해요. 끄면 브라우저 OCR을 먼저 시도해요.</p>' : '<p style="font-size:14px;font-weight:500">스캔 PDF · 사진 · 브라우저 OCR</p><p class="hint">글자가 없는 쪽은 브라우저에서 글자 인식(OCR)을 시도해요. 처음 한 번은 30초~1분 걸릴 수 있어요.</p>') + '</div>' +
       '<div style="border-top:1px solid #EDF2F8;padding-top:14px"><p style="font-size:13px;color:var(--ink-3);line-height:1.7">추출 항목 ' + BL.FIELDS.length + '개 · 기본정보 ' + counts.basic + ' · 기술 ' + counts.tech + ' · 인증 ' + counts.cert + ' · 상업 ' + counts.comm + '</p></div>' +
     '</div>' +
   '</div>';
 }
 function historyRow(a){
   var ev = evalOf(a); var dl = a.fields.bidDeadline ? BL.dday(a.fields.bidDeadline.v.date) : null;
-  return '<div class="list-row"><div style="min-width:0;flex:1 1 240px"><p class="t">' + esc(titleOf(a)) + (a.sample ? '<span class="badge-ex">샘플</span>' : '') + '</p><p class="s2">' + esc(a.fields.employer ? a.fields.employer.v.text : '발주처 미확인') + ' · ' + esc(shortName(a)) + ' · ' + new Date(a.createdAt).toLocaleDateString('ko-KR') + '</p></div><div class="gap8">' + ddChip(dl) + '<span class="st ' + VERDICT[ev.verdict].s + '">' + VERDICT[ev.verdict].t + ' · ' + ev.score + '</span><button type="button" class="btn-a btn-sm" data-open="' + a.id + '">열기</button></div></div>';
+  return '<div class="list-row"><div style="min-width:0;flex:1 1 240px"><p class="t">' + esc(titleOf(a)) + (a.sample ? '<span class="badge-ex">샘플</span>' : '') + '</p><p class="s2">' + esc(a.fields.employer ? a.fields.employer.v.text : '발주처 미확인') + (a.fields.rfpNo || !/^붙여넣은/.test(a.name || '') ? ' · ' + esc(shortName(a)) : '') + ' · ' + anDate(a) + '</p></div><div class="gap8">' + ddChip(dl) + '<span class="st ' + VERDICT[ev.verdict].s + '">' + VERDICT[ev.verdict].t + ' · ' + ev.score + '</span><button type="button" class="btn-a btn-sm" data-open="' + a.id + '">열기</button></div></div>';
 }
 
 /* ---------------- Processing ---------------- */
@@ -2067,6 +2160,7 @@ async function runOcr(pages, stepIdx){
   return { n: 0, err: lastErr, total: cand.length };
 }
 async function runAnalysis(src){
+  var liveSrc = S.pendingLive || null; S.pendingLive = null;
   S.view = 'processing';
   S.proc = { name: src.name, steps: [], progress: 0.05, error: null, aiRunning: false };
   renderRail(); renderMain(); window.scrollTo(0, 0);
@@ -2097,10 +2191,10 @@ async function runAnalysis(src){
       var io = procStep('스캔 페이지 글자 인식 (' + Math.min(scanPages, OCR_MAX) + '쪽)');
       ocrInfo = await runOcr(pages, io);
       if(ocrInfo.n) procDone(io, ocrInfo.skipped ? 'warn' : 'done', ocrInfo.n + '쪽을 ' + (ocrInfo.eng === 'claude' ? 'Claude가' : '브라우저 OCR로') + ' 읽었어요' + (ocrInfo.skipped ? ' · 나머지 ' + ocrInfo.skipped + '쪽은 시간이 오래 걸려 건너뛰었어요' : '') + ' · 원문과 한 번 대조해 주세요');
-      else procDone(io, 'warn', ocrInfo.err && ocrInfo.err.code === 'cancelled' ? '글자 인식을 중지했어요' : '글자 인식 도구를 쓸 수 없었어요' + (S.ai ? '' : ' · Claude 앱에서 열면 Claude가 스캔 페이지를 읽을 수 있어요'));
+      else procDone(io, 'warn', ocrInfo.err && ocrInfo.err.code === 'cancelled' ? '글자 인식을 중지했어요' : '글자 인식 도구를 쓸 수 없었어요' + (S.ai ? '' : ' · 인터넷 연결을 확인하거나 PDF에서 텍스트를 복사해 붙여넣어 주세요'));
     }
     var chars = pages.reduce(function(s, p){ return s + p.text.length; }, 0);
-    if(chars < 80){ S.proc.error = scanPages ? '스캔 페이지의 글자를 읽지 못했어요. ' + (S.ai ? '잠시 후 다시 시도하거나, ' : 'Claude 앱에서 이 페이지를 열면 Claude가 스캔을 읽을 수 있어요. 또는 ') + 'PDF에서 텍스트를 복사해 붙여넣어 주세요.' : '읽을 수 있는 글자가 거의 없어요. 텍스트를 붙여넣어 분석해 주세요.'; renderMain(); return; }
+    if(chars < 80){ S.proc.error = scanPages ? '스캔 페이지의 글자를 읽지 못했어요. ' + (S.ai ? '잠시 후 다시 시도하거나, ' : '') + 'PDF에서 텍스트를 복사해 붙여넣어 주세요.' : '읽을 수 있는 글자가 거의 없어요. 텍스트를 붙여넣어 분석해 주세요.'; renderMain(); return; }
     S.proc.progress = 0.7;
     var i2 = procStep('핵심 규격 추출 (문장 · 표 패턴 분석)');
     var fields = BL.extract(pages);
@@ -2114,10 +2208,10 @@ async function runAnalysis(src){
     }
     S.proc.progress = 0.92;
     var i4 = procStep('표준품 비교 · 판정 계산');
-    var titleLine = (pages[0].text.split('\n').filter(function(l){ return /supply|procurement|design|transformer|switchgear|substation|reactor|cable/i.test(l) && l.length < 140 && l.length > 12; })[0] || '').trim();
+    var titleLine = guessTitle(pages);
     var docs = {}; pages.forEach(function(p){ if(p.doc) docs[p.doc] = 1; });
     var ocrN = pages.filter(function(p){ return p.ocr; }).length;
-    var an = { id: uid(), createdAt: Date.now(), ocrPages: ocrN, name: src.name, title: titleLine, source: src.kind, sample: src.kind === 'sample', pages: pages, docCount: Object.keys(docs).length || 1, fields: fields, kind: BL.productKind(pages, fields), stdId: !S.stdChoice || S.stdChoice === 'auto' ? pickStd(fields) : S.stdChoice, autoStd: !S.stdChoice || S.stdChoice === 'auto', notes: {}, letterSel: null, done: {}, tasks: [] };
+    var an = { id: uid(), createdAt: Date.now(), ocrPages: ocrN, name: src.name, title: liveSrc ? liveSrc.title : titleLine, source: src.kind, sample: src.kind === 'sample', pages: pages, docCount: Object.keys(docs).length || 1, fields: fields, kind: BL.productKind(pages, fields), liveId: liveSrc ? liveSrc.id : undefined, liveUrl: liveSrc ? liveSrc.url : undefined, stdId: !S.stdChoice || S.stdChoice === 'auto' ? pickStd(fields) : S.stdChoice, autoStd: !S.stdChoice || S.stdChoice === 'auto', notes: {}, letterSel: null, done: {}, tasks: [] };
     analyses.unshift(an); saveAll();
     S.proc.progress = 1; procDone(i4, 'done');
     S.currentId = an.id; S.tab = 'summary'; S.group = 'all'; S.status = 'all'; S.sel = null; S.search = ''; S.showBrief = false;
@@ -2136,21 +2230,22 @@ function viewResult(){
   if(!an) return '<div class="card empty"><p style="margin-bottom:14px">열려 있는 분석이 없어요.</p><button type="button" class="btn-a pri" data-view="new">새 분석 시작</button></div>';
   var std = getStd(an.stdId); var ev = BL.evaluate(an, std, settings); var V = VERDICT[ev.verdict];
   var chk = BL.checklist(an, ev, std); var doneN = chk.filter(function(c){ return an.done && an.done[c.k]; }).length + (an.tasks || []).filter(function(t){ return t.done; }).length; var allN = chk.length + (an.tasks || []).length;
-  var tabs = [['summary','요약'], ['compare','규격 비교', ev.count.adj + ev.count.no + ev.count.ask, '확인이 필요한 항목 수 (조정 · 불일치 · 질의)'], ['evidence','원문 근거'], ['letter','질의서', (function(){ var lc = BL.letterCandidates(ev).map(function(r){ return r.def.k; }); var sel = an.letterSel || defaultSel(BL.letterCandidates(ev)); return sel.filter(function(k){ return lc.indexOf(k) >= 0; }).length; })(), '질의서에 넣은 항목 수'], ['prep','제출 준비', doneN + '/' + allN, '완료 / 전체 할 일'], ['notes','메모', Object.keys(an.notes || {}).length || '', '메모를 남긴 항목 수']];
+  var tabs = [['summary','요약'], ['compare','규격 비교', ev.count.adj + ev.count.no + ev.count.ask, '확인이 필요한 항목 수 (조정 · 불일치 · 질의)'], ['evidence','원문 근거'], ['letter','질의서', (function(){ var lc = BL.letterCandidates(ev).map(function(r){ return r.def.k; }); var sel = an.letterSel || defaultSel(BL.letterCandidates(ev), ev); return sel.filter(function(k){ return lc.indexOf(k) >= 0; }).length; })(), '질의서에 넣은 항목 수'], ['prep','제출 준비', doneN + '/' + allN, '완료 / 전체 할 일'], ['notes','메모', Object.keys(an.notes || {}).length || '', '메모를 남긴 항목 수']];
   var head = S.renaming
     ? '<form id="renameForm" class="gap8" style="flex:1 1 320px"><label class="sr" for="renameIn">분석 이름</label><input class="ainput" id="renameIn" value="' + esc(titleOf(an)) + '" style="flex:1 1 220px"><button type="submit" class="btn-a blue btn-sm">저장</button><button type="button" class="btn-a btn-sm" data-act="renameNo">취소</button></form>'
     : '<div style="min-width:0;flex:1 1 320px"><p class="mono" style="font-size:13px;color:var(--ink-3);overflow-wrap:anywhere">' + esc(an.fields.employer ? an.fields.employer.v.text : '발주처 미확인') + ' · ' + esc(shortName(an)) + (an.docCount > 1 ? ' · 파일 ' + an.docCount + '개' : '') + ' · ' + an.pages.length + '쪽' + (an.sample ? ' · 샘플' : '') + '</p><h1 class="ttl" style="margin-top:6px;overflow-wrap:anywhere">' + esc(titleOf(an)) + ' <button type="button" class="linkbtn" data-act="rename" style="font-family:var(--f-sans);font-size:13px;vertical-align:4px">이름 바꾸기</button></h1></div>';
   var html = '<div class="between">' + head +
-    '<div class="gap8"><label class="sr" for="resStd">비교 기준 표준품</label><select class="aselect" id="resStd" style="width:auto;max-width:250px" title="비교 기준 표준품">' + stdOptions(an.stdId) + '</select><button type="button" class="btn-a" data-act="exportCsv">CSV</button><button type="button" class="btn-a pri" data-act="exportXlsx">엑셀 내보내기</button></div></div>' +
+    '<div class="gap8 res-ctl"><label class="sr" for="resStd">비교 기준 표준품</label><select class="aselect" id="resStd" style="width:auto;max-width:250px" title="비교 기준 표준품">' + stdOptions(an.stdId) + '</select><span class="res-ex"><button type="button" class="btn-a" data-act="exportCsv">CSV</button><button type="button" class="btn-a pri" data-act="exportXlsx">엑셀 내보내기</button></span></div></div>' +
     (an.pagesDropped && !an.pages.length ? '<p class="hint" style="margin-top:10px">저장 공간 문제로 이 분석의 원문은 보관되지 않았어요. 값과 판정은 그대로 볼 수 있어요.</p>' : '') +
     '<div class="tabs" role="tablist" aria-label="분석 결과">' + tabs.map(function(t){ return '<button type="button" role="tab" aria-selected="' + (S.tab === t[0]) + '" tabindex="' + (S.tab === t[0] ? 0 : -1) + '" data-tab="' + t[0] + '"' + (t[3] ? ' title="' + t[3] + '"' : '') + '>' + t[1] + (t[2] !== undefined && t[2] !== '' ? '<span class="c">' + t[2] + '</span>' : '') + '</button>'; }).join('') + '</div>';
+  html += '<div id="tabpanel" role="tabpanel" aria-label="' + esc((tabs.filter(function(t){ return t[0] === S.tab; })[0] || ['', ''])[1]) + '">';
   if(S.tab === 'summary') html += tabSummary(an, ev, std, V);
   else if(S.tab === 'compare') html += tabCompare(an, ev, std);
   else if(S.tab === 'evidence') html += tabEvidence(an, ev, std);
   else if(S.tab === 'letter') html += tabLetter(an, ev, std);
   else if(S.tab === 'prep') html += tabPrep(an, ev, chk);
   else html += tabNotes(an, ev);
-  return html;
+  return html + '</div>';
 }
 function specCard(an, ev, std){
   var keys = ['voltage','capacity','cooling','frequency','vector','insulation','bil','impedance','tap','tempRise','ambient','noise','standard','lossCap'];
@@ -2162,7 +2257,7 @@ function specCard(an, ev, std){
   var multiNote = multi.length ? '<p class="hint" style="margin:-4px 0 12px;color:#A15C00">문서에 ' + multi.map(function(k){ return BL.FMAP[k].label; }).join(' · ') + ' 값이 여러 개 있어요(로트별 사양일 수 있어요). 카드를 눌러 원문 근거에서 맞는 값을 골라 주세요.</p>' : '';
   return '<div class="card pad" style="margin-top:16px"><div class="between" style="align-items:center;margin-bottom:12px"><p style="font-weight:600">기술 사양 한눈에 <span class="hint" style="display:inline;font-weight:400">· ' + found + ' / ' + rows.length + '개 항목 확인</span></p><button type="button" class="linkbtn" data-tab="compare" style="font-family:var(--f-sans);font-size:13px">표로 비교</button></div>' +
     multiNote + '<div class="spec-grid">' + rows.map(function(r){
-      var val = r.v ? r.def.show(r.v) : '문서에 없음';
+      var val = r.v ? r.def.show(r.v) : '미기재';
       return '<button type="button" class="spec-cell" ' + (r.v ? 'data-ev="' + r.def.k + '"' : 'data-edit-go="' + r.def.k + '"') + '><span class="sl">' + r.def.label + '</span><span class="sv' + (r.v ? '' : ' none') + '">' + esc(val) + '</span>' + (r.def.g === 'tech' && r.c.st !== 'info' ? '<span class="st st-' + r.c.st + '" style="margin-top:6px;align-self:flex-start">' + STL[r.c.st] + '</span>' : '') + '</button>';
     }).join('') + '</div>' +
     (lc ? '<p class="hint" style="margin-top:12px">손실 평가 가산: 자사 표준품 보증값(무부하 ' + std.nll + ' kW · 부하 ' + std.ll + ' kW) 기준 약 <b style="color:var(--ink)">' + esc(BL.FIELDS ? (an.fields.lossCap.v.cur + ' ' + Number(lc).toLocaleString('en-US')) : '') + '</b>/대가 입찰가에 더해져 평가돼요.</p>' : '') +
@@ -2192,11 +2287,12 @@ function tabSummary(an, ev, std, V){
   var issues = ev.rows.filter(function(r){ return r.c.st === 'no' || r.c.st === 'adj' || r.c.st === 'ask'; });
   var order = { no: 0, adj: 1, ask: 2 };
   issues.sort(function(a, b){ return order[a.c.st] - order[b.c.st]; });
-  var why = ev.closed ? '제출 마감(' + BL.fmtDate(an.fields.bidDeadline.v.date) + ')이 지난 공고예요. 마감 전이었다면 판정은 ' + ({ bid: 'Bid', review: '검토 필요', nobid: 'No-Bid' })[ev.wouldBe] + '이에요. 유사 입찰 준비나 실적 분석용으로 참고하세요.' : ev.kind === 'reactor' ? '변압기가 아니라 리액터(분로 · 직렬 리액터 등) 입찰이에요. 등록된 변압기 표준품과는 비교할 수 없어서 불참으로 표시했어요. 리액터를 생산한다면 설계팀과 따로 검토하세요.' : ev.kind === 'single' && ev.newDesign && !ev.ko.length ? '단상 변압기(철도 · 배전용 등) 입찰이에요. 3상 표준품과 철심 · 권선 구조가 달라 사실상 신규 설계예요. 단상 표준품을 등록하거나 설계팀 검토 후 판단하세요.' : ev.ko.length ? (ev.kind === 'single' ? '단상 변압기 입찰이에요(3상 표준품과 구조가 달라요). ' : '') + koText(ev) :
+  var noL = ev.rows.filter(function(r){ return r.c.st === 'no'; }).map(function(r){ return r.def.label; }), noTxt = noL.length ? ' 불일치 항목: ' + noL.slice(0, 3).join(', ') + (noL.length > 3 ? ' 외 ' + (noL.length - 3) + '개.' : '.') : '';
+  var why = ev.closed ? '제출 마감(' + BL.fmtDate(an.fields.bidDeadline.v.date) + ')이 지난 공고예요. 마감 전 기준으로는 ' + ({ bid: 'Bid', review: '검토 필요', nobid: 'No-Bid', hold: '판단 보류(정보 부족)' })[ev.wouldBe] + ' 판정이에요. 유사 입찰 준비나 실적 분석용으로 참고하세요.' : ev.kind === 'reactor' ? '변압기가 아니라 리액터(분로 · 직렬 리액터 등) 입찰이에요. 등록된 변압기 표준품과는 비교할 수 없어서 불참으로 표시했어요. 리액터를 생산한다면 설계팀과 따로 검토하세요.' : ev.kind === 'single' && ev.newDesign && !ev.ko.length ? '단상 변압기(철도 · 배전용 등) 입찰이에요. 3상 표준품과 철심 · 권선 구조가 달라 사실상 신규 설계예요. 단상 표준품을 등록하거나 설계팀 검토 후 판단하세요.' : ev.ko.length ? (ev.kind === 'single' ? '단상 변압기 입찰이에요(3상 표준품과 구조가 달라요). ' : '') + koText(ev) :
     ev.verdict === 'bid' ? '결격 사유가 없고 점수가 참여 기준(' + settings.thresholds.bid + '점)을 넘었어요.' :
-    ev.lowInfo ? '점수는 낮지만 문서에 없는 항목(질의 필요)이 ' + ev.count.ask + '개라 판단을 보류했어요. 사양서 등 빠진 문서를 함께 올리거나 질의서로 물어본 뒤 다시 보세요.' :
+    ev.lowInfo ? '점수는 낮지만 미기재 항목(질의 필요)이 ' + ev.count.ask + '개라 판단을 보류했어요. 사양서 등 빠진 문서를 함께 올리거나 질의서로 물어본 뒤 다시 보세요.' + noTxt :
     ev.newDesign ? '정격(전압 · 용량 · 주파수 · 결선) 중 ' + ev.rows.filter(function(r){ return ['voltage','capacity','frequency','vector'].indexOf(r.def.k) >= 0 && r.c.st === 'no'; }).length + '개가 표준품과 달라 사실상 신규 설계예요. 맞는 표준품을 등록하거나 설계팀 검토 후 판단하세요.' :
-    ev.verdict === 'review' ? '결격 사유는 없지만 조정이나 질의가 필요한 항목이 있어요. 아래 목록을 확인하세요.' : '점수가 검토 기준(' + settings.thresholds.review + '점)보다 낮아요.';
+    ev.verdict === 'review' ? '결격 사유는 없지만 점수(' + ev.score + '점)가 참여 기준(' + settings.thresholds.bid + '점)에 못 미쳐요. 조정 · 질의 항목을 해결하면 올라가요.' + noTxt : '점수(' + ev.score + '점)가 검토 기준(' + settings.thresholds.review + '점)보다 낮아요.' + noTxt;
   var ko = ev.rows.filter(function(r){ return r.c.ko && ['typeTest','experience','iso','localAgent','bidDeadline'].indexOf(r.def.k) < 0; }).concat(['typeTest','experience','iso','localAgent','bidDeadline'].map(function(k){ return ev.rows.filter(function(r){ return r.def.k === k; })[0]; }));
   var cd = f.clarDeadline ? BL.dday(f.clarDeadline.v.date) : null;
   var brief = BL.brief(an, ev, std);
@@ -2207,14 +2303,14 @@ function tabSummary(an, ev, std, V){
       (S.showBrief ? '<div class="brief" style="color:var(--ink)">' + esc(brief) + '</div>' : '') +
     '</div>' +
     '<div class="kpis" style="flex:1 1 260px">' +
-      '<div class="kpi"><p class="l">제출 마감</p><p class="v">' + (f.bidDeadline ? BL.ddayText(BL.dday(f.bidDeadline.v.date)) : '-') + '</p><p class="hint" style="margin-top:2px">' + (f.bidDeadline ? BL.fmtDate(f.bidDeadline.v.date) : '문서에서 못 찾음') + '</p></div>' +
-      '<div class="kpi"><p class="l">질의 마감</p><p class="v" style="color:' + (cd != null && cd <= 7 && cd >= 0 ? '#A15C00' : 'inherit') + '">' + (f.clarDeadline ? BL.ddayText(cd) : '-') + '</p><p class="hint" style="margin-top:2px">' + (f.clarDeadline ? BL.fmtDate(f.clarDeadline.v.date) : '문서에서 못 찾음') + '</p></div>' +
+      '<div class="kpi"><p class="l">제출 마감</p><p class="v">' + (f.bidDeadline ? BL.ddayText(BL.dday(f.bidDeadline.v.date)) : '-') + '</p><p class="hint" style="margin-top:2px">' + (f.bidDeadline ? BL.fmtDate(f.bidDeadline.v.date) : '미기재') + '</p></div>' +
+      '<div class="kpi"><p class="l">질의 마감</p><p class="v" style="color:' + (cd != null && cd <= 7 && cd >= 0 ? '#A15C00' : 'inherit') + '">' + (f.clarDeadline ? BL.ddayText(cd) : '-') + '</p><p class="hint" style="margin-top:2px">' + (f.clarDeadline ? BL.fmtDate(f.clarDeadline.v.date) : '미기재') + '</p></div>' +
       (function(){ var lc = f.lossCap && std ? BL.lossCost(f.lossCap.v, std) : null; return lc ? '<div class="kpi"><p class="l">손실 평가 가산</p><p class="v" style="font-size:20px">' + esc(f.lossCap.v.cur) + ' ' + (lc >= 1e6 ? (lc / 1e6).toFixed(2) + 'M' : Math.round(lc / 1000) + 'k') + '</p><p class="hint" style="margin-top:2px">대당' + (f.quantity && f.quantity.v.n > 1 ? ' · ' + f.quantity.v.n + '대 합계 ' + esc(f.lossCap.v.cur) + ' ' + Math.round(lc * f.quantity.v.n / 1000).toLocaleString('en-US') + 'k' : '') + ' · 자사 보증값 기준</p></div>' : '<div class="kpi"><p class="l">적용 표준</p><p class="v" style="font-size:20px">' + (f.standard ? (f.standard.v.std === 'both' ? 'IEC+IEEE' : f.standard.v.std) : '-') + '</p></div>'; })() +
       '<div class="kpi"><p class="l">견적 통화</p><p class="v" style="font-size:20px">' + (f.currency ? esc(f.currency.v.code) : '-') + '</p></div>' +
     '</div></div>' +
   '<div class="flex">' +
     '<div class="card pad" style="flex:1 1 300px"><p style="font-weight:600;margin-bottom:14px">참여 조건 체크 <span class="hint" style="display:inline;font-weight:400">· 제품 · 자격 · 마감</span></p><div class="stack" style="gap:12px;font-size:14px">' + ko.map(function(r){
-      var t = !r.v && (r.def.k === 'iso' || r.def.k === 'localAgent') ? '<span style="color:var(--ink-3);font-weight:600;white-space:nowrap">언급 없음</span>' : !r.v ? '<span style="color:var(--ask);font-weight:600;white-space:nowrap">문서에 없음</span>' : r.c.closed ? '<span style="color:var(--ink-3);font-weight:600;white-space:nowrap">마감 지남</span>' : r.c.ko ? '<span style="color:var(--no);font-weight:600;white-space:nowrap">' + (r.def.g === 'tech' ? '제품 불일치' : '결격') + '</span>' : r.c.st === 'adj' ? '<span style="color:#A15C00;font-weight:600;text-align:right">' + esc(r.c.note) + '</span>' : '<span style="color:var(--ok);font-weight:600">통과</span>';
+      var t = !r.v && (r.def.k === 'iso' || r.def.k === 'localAgent') ? '<span style="color:var(--ink-3);font-weight:600;white-space:nowrap">언급 없음</span>' : !r.v ? '<span style="color:var(--ask);font-weight:600;white-space:nowrap">미기재</span>' : r.c.closed ? '<span style="color:var(--ink-3);font-weight:600;white-space:nowrap">마감 지남</span>' : r.c.ko ? '<span style="color:var(--no);font-weight:600;white-space:nowrap">' + (r.def.g === 'tech' ? '제품군 불일치' : '결격') + '</span>' : r.c.st === 'adj' ? '<span style="color:#A15C00;font-weight:600;text-align:right">' + esc(r.c.note) + '</span>' : '<span style="color:var(--ok);font-weight:600">통과</span>';
       return '<div class="between" style="gap:12px;align-items:center;flex-wrap:nowrap"><span style="min-width:0">' + r.def.label + (r.v ? ' <span class="hint" style="display:inline">· ' + esc(r.def.show(r.v)) + '</span>' : '') + '</span>' + t + '</div>';
     }).join('') + '</div></div>' +
     '<div class="card pad" style="flex:1 1 300px"><div class="between" style="margin-bottom:14px"><p style="font-weight:600">점수 구성</p><button type="button" class="linkbtn" data-view="settings" style="font-family:var(--f-sans);font-size:13px">가중치 조정</button></div><div class="stack" style="gap:14px;font-size:14px">' + ev.parts.map(function(p){
@@ -2298,7 +2394,7 @@ function tabEvidence(an, ev, std){
 }
 function tabLetter(an, ev, std){
   var cands = BL.letterCandidates(ev);
-  if(!an.letterSel) an.letterSel = defaultSel(cands);
+  if(!an.letterSel) an.letterSel = defaultSel(cands, ev);
   var text = an.letterEdited && an.letterText != null ? an.letterText : BL.buildLetter(an, ev, std, an.letterSel, settings.profile);
   var cd = an.fields.clarDeadline ? BL.dday(an.fields.clarDeadline.v.date) : null;
   var lock = !!an.letterEdited;
@@ -2311,8 +2407,8 @@ function tabLetter(an, ev, std){
     '<div class="card pad stack" style="flex:1 1 260px">' +
       '<p style="font-weight:600">포함할 항목</p>' +
       (cands.length ? '<div>' + cands.map(function(r){ return '<label class="chk" for="lt-' + r.def.k + '"><input id="lt-' + r.def.k + '" type="checkbox" data-lsel="' + r.def.k + '"' + (an.letterSel.indexOf(r.def.k) >= 0 ? ' checked' : '') + (lock ? ' disabled' : '') + '><span>' + r.def.label + ' <span class="hint" style="display:inline">· ' + STL[r.c.st] + '</span></span></label>'; }).join('') + '</div>' : '<p class="hint">질의할 항목이 없어요.</p>') +
-      (!settings.profile.company ? '<p class="hint" style="margin:0;color:#A15C00">서명에 들어갈 회사명이 비어 있어요. <button type="button" class="linkbtn" data-view="settings" style="font-family:var(--f-sans);font-size:12.5px;padding:0;min-height:0">설정에서 입력</button></p>' : '') +
-      '<div style="border-top:1px solid #EDF2F8;padding-top:14px"><div class="stack" style="gap:8px"><button type="button" class="btn-a blue" data-act="copyLetter">본문 복사</button><button type="button" class="btn-a" data-act="saveLetter">텍스트 파일로 저장</button>' + '<button type="button" class="btn-a" data-act="resetLetter" id="resetLetterBtn"' + (lock ? '' : ' hidden') + '>초안 다시 만들기</button>' + '' + (an.done && an.done.clar ? '<button type="button" class="btn-a" data-act="letterSent" aria-pressed="true" style="border-color:#A8DDBF;color:var(--ok)">✓ 발송 완료 · 취소</button>' : '<button type="button" class="btn-a" data-act="letterSent">발송 완료로 표시</button>') + '</div></div>' +
+      (!settings.profile.company || !settings.profile.name || /[\u3131-\uD79D]/.test(settings.profile.name) ? '<p class="hint" style="margin:0;color:#A15C00">' + (!settings.profile.company ? '서명에 들어갈 회사명이 비어 있어요. ' : '') + (!settings.profile.name || /[\u3131-\uD79D]/.test(settings.profile.name) ? '서명 이름이 ' + (settings.profile.name ? '한글이라' : '비어 있어') + ' [Name]으로 남아요. 영문 이름을 넣어 주세요. ' : '') + '<button type="button" class="linkbtn" data-view="settings" style="font-family:var(--f-sans);font-size:12.5px;padding:0;min-height:0">설정에서 입력</button></p>' : '') +
+      '<div style="border-top:1px solid #EDF2F8;padding-top:14px"><div class="stack" style="gap:8px">' + (!lock && !an.letterSel.filter(function(k){ return cands.some(function(r){ return r.def.k === k; }); }).length ? '<p class="hint" style="margin:0">넣을 항목을 하나 이상 고르면 복사 · 저장할 수 있어요.</p><button type="button" class="btn-a blue" disabled>본문 복사</button><button type="button" class="btn-a" disabled>PDF로 저장</button><button type="button" class="btn-a" disabled>텍스트 파일로 저장</button>' : '<button type="button" class="btn-a blue" data-act="copyLetter">본문 복사</button><button type="button" class="btn-a" data-act="pdfLetter">PDF로 저장</button><button type="button" class="btn-a" data-act="saveLetter">텍스트 파일로 저장</button>') + '<button type="button" class="btn-a" data-act="resetLetter" id="resetLetterBtn"' + (lock ? '' : ' hidden') + '>초안 다시 만들기</button>' + '' + (an.done && an.done.clar ? '<button type="button" class="btn-a" data-act="letterSent" aria-pressed="true" style="border-color:#A8DDBF;color:var(--ok)">✓ 발송 완료 · 취소</button>' : '<button type="button" class="btn-a" data-act="letterSent">발송 완료로 표시</button>') + '</div></div>' + trBlock(an) +
     '</div></div>';
 }
 function tabPrep(an, ev, chk){
@@ -2349,13 +2445,15 @@ function viewHistory(){
     if(!q) return true;
     return [a.name, a.title, a.fields.employer && a.fields.employer.v.text, a.fields.rfpNo && a.fields.rfpNo.v.text].join(' ').toLowerCase().indexOf(q) >= 0;
   });
-  return '<h1 class="ttl">분석 이력</h1><p class="lede-a">이 브라우저에 저장된 분석 ' + analyses.length + '건</p>' +
-  '<div class="between" style="margin-top:20px;align-items:center"><div style="flex:1 1 260px;max-width:420px"><label class="sr" for="hq">이력 검색</label><input class="ainput" id="hq" type="search" placeholder="발주처, 입찰번호, 이름으로 검색" value="' + esc(S.hq) + '"></div><div class="chips">' + [['all','전체'], ['bid','Bid'], ['review','검토 필요'], ['hold','판단 보류'], ['nobid','No-Bid'], ['closed','마감 지남']].map(function(v){ return '<button type="button" class="chip" aria-pressed="' + (S.hv === v[0]) + '" data-hv="' + v[0] + '">' + v[1] + '</button>'; }).join('') + '</div></div>' +
+  var dlOf = function(a){ var n = a.fields.bidDeadline ? BL.dday(a.fields.bidDeadline.v.date) : null; return n == null ? 1e9 : n < 0 ? 1e8 - n : n; };
+  list = list.slice().sort(S.hs === 'due' ? function(a, b){ return dlOf(a) - dlOf(b); } : S.hs === 'score' ? function(a, b){ return evalOf(b).score - evalOf(a).score; } : function(a, b){ return (b.createdAt || 0) - (a.createdAt || 0); });
+  return '<h1 class="ttl">분석 이력</h1><p class="lede-a">이 브라우저에 저장된 분석 ' + analyses.length + '건' + (list.length !== analyses.length ? ' · 조건에 맞는 ' + list.length + '건' : '') + '</p>' +
+  '<div class="between" style="margin-top:20px;align-items:center"><div style="flex:1 1 260px;max-width:420px"><label class="sr" for="hq">이력 검색</label><input class="ainput" id="hq" type="search" placeholder="발주처, 입찰번호, 이름으로 검색" value="' + esc(S.hq) + '"></div><div><label class="sr" for="hsort">정렬</label><select class="aselect" id="hsort" style="width:auto">' + [['new','최신순'], ['due','마감 임박순'], ['score','점수 높은순']].map(function(o){ return '<option value="' + o[0] + '"' + (S.hs === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select></div><div class="chips">' + [['all','전체'], ['bid','Bid'], ['review','검토 필요'], ['hold','판단 보류'], ['nobid','No-Bid'], ['closed','마감 지남']].map(function(v){ return '<button type="button" class="chip" aria-pressed="' + (S.hv === v[0]) + '" data-hv="' + v[0] + '">' + v[1] + '</button>'; }).join('') + '</div></div>' +
   '<div class="card" style="margin-top:16px">' + (list.length ? list.map(function(a){
     var ev = evalOf(a); var dl = a.fields.bidDeadline ? BL.dday(a.fields.bidDeadline.v.date) : null;
     var right = S.pendingDelete === a.id ? '<div class="confirm" role="group" aria-label="삭제 확인">이 분석을 삭제할까요?<button type="button" class="btn-a danger btn-sm" data-del-yes="' + a.id + '">삭제</button><button type="button" class="btn-a btn-sm" data-act="delNo">취소</button></div>'
-      : '<div class="gap8">' + ddChip(dl) + '<span class="st ' + VERDICT[ev.verdict].s + '">' + VERDICT[ev.verdict].t + ' · ' + ev.score + '</span><button type="button" class="btn-a btn-sm" data-open="' + a.id + '">열기</button><button type="button" class="btn-a btn-sm danger" data-del="' + a.id + '" aria-label="' + esc(titleOf(a)) + ' 삭제">삭제</button></div>';
-    return '<div class="list-row"><div style="min-width:0;flex:1 1 260px"><p class="t">' + esc(titleOf(a)) + (a.sample ? '<span class="badge-ex">샘플</span>' : '') + '</p><p class="s2">' + esc(a.fields.employer ? a.fields.employer.v.text : '발주처 미확인') + ' · ' + esc(shortName(a)) + ' · ' + new Date(a.createdAt).toLocaleDateString('ko-KR') + ' · ' + esc(getStd(a.stdId) ? getStd(a.stdId).name : '') + '</p></div>' + right + '</div>';
+      : '<div class="gap8">' + ddChip(dl) + '<span class="st ' + VERDICT[ev.verdict].s + '">' + VERDICT[ev.verdict].t + ' · ' + ev.score + '</span><span class="row-act"><button type="button" class="btn-a btn-sm" data-open="' + a.id + '">열기</button><button type="button" class="btn-a btn-sm danger" data-del="' + a.id + '" aria-label="' + esc(titleOf(a)) + ' 삭제">삭제</button></span></div>';
+    return '<div class="list-row"><div style="min-width:0;flex:1 1 260px"><p class="t">' + esc(titleOf(a)) + (a.sample ? '<span class="badge-ex">샘플</span>' : '') + '</p><p class="s2">' + esc(a.fields.employer ? a.fields.employer.v.text : '발주처 미확인') + (a.fields.rfpNo || !/^붙여넣은/.test(a.name || '') ? ' · ' + esc(shortName(a)) : '') + ' · ' + anDate(a) + ' · ' + esc(getStd(a.stdId) ? getStd(a.stdId).name : '') + '</p></div>' + right + '</div>';
   }).join('') : analyses.length ? '<p class="empty">조건에 맞는 분석이 없어요.</p>' : '<div class="empty"><p style="margin-bottom:14px">아직 분석이 없어요.</p><button type="button" class="btn-a pri" data-view="new">새 분석 시작</button></div>') + '</div>';
 }
 var COOL = ['ONAN','ONAF','OFAF','ODAF','AN','AF'];
@@ -2363,7 +2461,7 @@ function stdForm(s){
   var isNew = !s.id;
   function num(id, label, val, step){ return '<div><label class="alabel" for="' + id + '">' + label + '</label><input class="ainput" id="' + id + '" type="number" inputmode="decimal" step="' + (step || 'any') + '" value="' + (val == null ? '' : val) + '"></div>'; }
   function yn(id, label, val){ return '<label class="chk" for="' + id + '" style="margin-right:12px"><input id="' + id + '" type="checkbox"' + (val ? ' checked' : '') + '>' + label + '</label>'; }
-  return '<form class="card pad" id="stdForm" novalidate><p style="font-weight:600;margin-bottom:16px">' + (isNew ? '표준품 추가' : '표준품 수정 · ' + esc(s.name)) + '</p>' +
+  return '<form class="card pad" id="stdForm" novalidate><p style="font-weight:600;margin-bottom:16px">' + (isNew ? '표준품 추가' : '표준품 수정 · ' + esc(s.name)) + '</p><p class="err" id="sfErr" role="alert" style="color:var(--no);line-height:1.7;margin:-8px 0 12px"></p>' +
     '<div class="stack"><div><label class="alabel" for="sfName">이름</label><input class="ainput" id="sfName" value="' + esc(s.name || '') + '" placeholder="예: 154kV 60MVA 유입식"></div>' +
     '<div class="form-grid">' + num('sfHv', '1차 전압 (kV)', s.hv) + num('sfLv', '2차 전압 (kV)', s.lv) + num('sfMva', '최종 용량 (MVA)', s.mva) + '<div><label class="alabel" for="sfStages">냉각 단계별 용량 (MVA)</label><input class="ainput" id="sfStages" value="' + esc((s.stages || []).join('/')) + '" placeholder="45/60"></div>' +
       '<div><label class="alabel" for="sfFreq">주파수</label><select class="aselect" id="sfFreq"><option value="60"' + (s.freq === '60' ? ' selected' : '') + '>60 Hz</option><option value="50"' + (s.freq === '50' ? ' selected' : '') + '>50 Hz</option><option value="both"' + (s.freq === 'both' ? ' selected' : '') + '>50/60 Hz</option></select></div>' +
@@ -2381,7 +2479,7 @@ function stdForm(s){
     '</div>' +
     '<fieldset style="border:none;padding:0;margin:0"><legend class="alabel">대응 가능한 냉각 방식</legend><div class="gap8">' + COOL.map(function(c){ return '<label class="chk" for="cl-' + c + '" style="margin-right:10px"><input id="cl-' + c + '" type="checkbox" data-cool="' + c + '"' + ((s.cooling || []).indexOf(c) >= 0 ? ' checked' : '') + '>' + c + '</label>'; }).join('') + '</div></fieldset>' +
     '<div class="gap8">' + yn('sfTT', '형식시험 성적서 보유', s.typeTest) + yn('sfSC', '단락(동적) 시험 성적서 보유', s.scTest) + yn('sfIso', 'ISO 9001 보유', s.iso) + yn('sfAg', '현지 대리인 등록', s.agent) + '</div>' +
-    '<p class="err" id="sfErr" role="alert" style="color:var(--no)"></p>' +
+
     '<div class="gap8"><button type="submit" class="btn-a blue">저장</button><button type="button" class="btn-a" data-act="stdCancel">취소</button></div></div></form>';
 }
 function viewStandards(){
@@ -2389,7 +2487,8 @@ function viewStandards(){
   return '<div class="between"><div><h1 class="ttl">자사 표준품</h1><p class="lede-a">입찰서와 비교할 기준 사양이에요. 우리 회사 제품에 맞게 고쳐 쓰세요.</p></div>' + (editing ? '' : '<button type="button" class="btn-a pri" data-act="stdNew">+ 표준품 추가</button>') + '</div>' +
   '<div class="stack" style="margin-top:22px">' + (editing ? stdForm(editing === 'draft' ? S.stdDraft : editing === 'new' ? { cooling: ['ONAN'], freq: '60', insulation: 'oil', standard: 'IEC', typeTest: true, iso: true } : editing.indexOf('copy:') === 0 ? Object.assign({}, getStd(editing.slice(5)), { id: null, name: getStd(editing.slice(5)).name + ' 사본' }) : getStd(editing)) : '') +
   stds.map(function(s){
-    var right = S.pendingStdDelete === s.id ? '<div class="confirm">삭제할까요?<button type="button" class="btn-a danger btn-sm" data-sdel-yes="' + s.id + '">삭제</button><button type="button" class="btn-a btn-sm" data-act="sdelNo">취소</button></div>' :
+    var nUse = analyses.filter(function(a){ return a.stdId === s.id; }).length;
+    var right = S.pendingStdDelete === s.id ? '<div class="confirm" role="group" aria-label="표준품 삭제 확인">' + (nUse ? '분석 ' + nUse + '건이 기본 표준품으로 바뀌어요. ' : '') + '삭제할까요?<button type="button" class="btn-a danger btn-sm" data-sdel-yes="' + s.id + '">삭제</button><button type="button" class="btn-a btn-sm" data-act="sdelNo">취소</button></div>' :
       '<div class="gap8">' + (settings.defaultStd === s.id ? '<span class="st st-info">기본</span>' : '<button type="button" class="btn-a btn-sm" data-sdef="' + s.id + '">기본으로</button>') + '<button type="button" class="btn-a btn-sm" data-sedit="' + s.id + '">수정</button><button type="button" class="btn-a btn-sm" data-scopy="' + s.id + '">복제</button>' + (stds.length > 1 ? '<button type="button" class="btn-a btn-sm danger" data-sdel="' + s.id + '">삭제</button>' : '') + '</div>';
     return '<div class="card pad"><div class="between"><p style="font-weight:600;font-size:17px">' + esc(s.name) + (s.example ? '<span class="badge-ex">예시</span>' : '') + '</p>' + right + '</div>' +
       '<div class="gap8" style="margin-top:12px;font-size:13px;color:var(--ink-2)">' + [s.hv + '/' + s.lv + ' kV', (s.stages && s.stages.length > 1 ? s.stages.join('/') : s.mva) + ' MVA', s.freq === 'both' ? '50/60 Hz' : s.freq + ' Hz', s.insulation === 'dry' ? '건식' : s.insulation === 'ester' ? '유입식(에스테르)' : '유입식', (s.cooling || []).join('/'), 'LI ' + s.bil + ' kV', '%Z ' + s.z, s.vector || '', s.tapType ? s.tapType + (s.tapRange ? ' ±' + s.tapRange + '%' : '') : '', s.wdgRise ? (s.oilRise ? s.oilRise + '/' : '') + s.wdgRise + ' K' : '', s.noise ? s.noise + ' dB(A)' : '', s.nll ? 'P0 ' + s.nll + ' kW' : '', s.ll ? 'Pk ' + s.ll + ' kW' : '', s.standard === 'both' ? 'IEC·IEEE' : s.standard, '출하 ' + s.delivery + '주' + (s.transit ? ' + 운송 ' + s.transit + '주' : ''), '보증 ' + s.warranty + '개월', '실적 ' + s.exp + '건', s.typeTest ? (s.typeLab || '') + ' 성적서' : '성적서 없음', s.iso ? 'ISO 9001' : 'ISO 없음', s.agent ? '대리인 등록' : '대리인 미등록'].filter(Boolean).map(function(x){ return '<span style="padding:4px 10px;background:var(--paper);border-radius:8px">' + esc(x) + '</span>'; }).join('') + '</div></div>';
@@ -2398,11 +2497,130 @@ function viewStandards(){
 function viewSchedule(){
   var list = upcoming();
   var fut = list.filter(function(u){ return u.n >= 0; }), past = list.filter(function(u){ return u.n < 0; });
-  function row(u){ return '<div class="list-row"><div class="gap8" style="gap:14px;flex:1 1 260px;flex-wrap:nowrap">' + ddChip(u.n) + '<div style="min-width:0"><p class="t">' + (u.k === 'bidDeadline' ? '제출 마감' : '질의 마감') + ' · ' + esc(titleOf(u.a)) + '</p><p class="s2">' + BL.fmtDate(u.date) + ' · ' + esc(shortName(u.a)) + '</p></div></div><button type="button" class="btn-a btn-sm" data-open="' + u.a.id + '" data-open-tab="' + (u.k === 'clarDeadline' ? 'letter' : 'prep') + '">' + (u.k === 'clarDeadline' ? '질의서 보기' : '제출 준비 보기') + '</button></div>'; }
-  return '<h1 class="ttl">입찰 일정</h1><p class="lede-a">분석한 입찰서에서 뽑은 질의 · 제출 마감이에요. 급한 순서로 보여줘요.</p>' +
-  '<div class="card" style="margin-top:22px">' + (fut.length ? fut.map(row).join('') : '<p class="empty">다가오는 마감이 없어요. 입찰서를 분석하면 마감일이 여기에 모여요.</p>') + '</div>' +
+  function row(u){ if(u.w) return '<div class="list-row"><div class="gap8" style="gap:14px;flex:1 1 260px;flex-wrap:nowrap">' + ddChip(u.n) + '<div style="min-width:0"><p class="t">제출 마감 · ' + esc(u.w.title) + '</p><p class="s2">' + BL.fmtDate(u.date) + ' · ' + esc([u.w.src, u.w.buyer, liveCountry(u.w)].filter(Boolean).join(' · ')) + ' · 해외 공고</p></div></div><a class="btn-a btn-sm" href="' + esc(u.w.url) + '" target="_blank" rel="noopener noreferrer">원문 보기</a></div>'; return '<div class="list-row"><div class="gap8" style="gap:14px;flex:1 1 260px;flex-wrap:nowrap">' + ddChip(u.n) + '<div style="min-width:0"><p class="t">' + (u.k === 'bidDeadline' ? '제출 마감' : '질의 마감') + ' · ' + esc(titleOf(u.a)) + '</p><p class="s2">' + BL.fmtDate(u.date) + ' · ' + esc(shortName(u.a)) + '</p></div></div><button type="button" class="btn-a btn-sm" data-open="' + u.a.id + '" data-open-tab="' + (u.k === 'clarDeadline' ? 'letter' : 'prep') + '">' + (u.k === 'clarDeadline' ? '질의서 보기' : '제출 준비 보기') + '</button></div>'; }
+  return '<h1 class="ttl">입찰 일정</h1><p class="lede-a">분석한 입찰서의 질의 · 제출 마감과, "해외 공고"에서 일정에 추가한 공고의 마감이에요. 급한 순서로 보여줘요.</p>' +
+  '<div class="card pad" style="margin-top:22px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;border-color:#C9DBF3;background:#F5F9FF"><p style="min-width:0;flex:1 1 260px">세계은행 · EU에 올라온 해외 전력 입찰 공고도 마감과 함께 볼 수 있어요.</p><button type="button" class="btn-a btn-sm blue" data-view="live">해외 공고 보기</button></div>' +
+  '<div class="card" style="margin-top:16px">' + (fut.length ? fut.map(row).join('') : '<p class="empty">다가오는 마감이 없어요. 입찰서를 분석하거나 해외 공고를 일정에 추가하면 마감일이 여기에 모여요.</p>') + '</div>' +
   (past.length ? '<p style="font-weight:600;margin:28px 0 10px;color:var(--ink-3)">지난 마감</p><div class="card">' + past.map(row).join('') + '</div>' : '');
 }
+/* ---------------- Live tenders (해외 공고) ---------------- */
+var LIVE = { status: 'idle', data: null, via: '', err: '', cat: 'all', q: '', country: 'all', soon: false };
+function cleanWatch(a){ return (Array.isArray(a) ? a : []).filter(function(w){ return w && typeof w === 'object' && typeof w.id === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(String(w.deadline || '')) && /^https?:\/\//i.test(String(w.url || '')); }).map(function(w){ return { id: w.id, src: String(w.src || ''), title: String(w.title || w.id), buyer: String(w.buyer || ''), country: String(w.country || ''), deadline: w.deadline, url: String(w.url), ref: String(w.ref || '') }; }); }
+var watched = cleanWatch(LS.get('bl.watch', []));
+function saveWatch(){ LS.set('bl.watch', watched); }
+var LIVE_CATS = [['all','전체'], ['transformer','변압기'], ['substation','변전소'], ['switchgear','개폐기 · 차단기'], ['line','송배전 선로'], ['power','기타 전력']];
+var LIVE_CAT_RE = [['transformer', /transformer|\bxfmr\b|\bkva\b|\bmva\b/i], ['substation', /substation|switchyard|grid station|\bgis\b|bay extension/i], ['switchgear', /switchgear|circuit breaker|recloser|ring main unit|\brmu\b|disconnector|isolator/i], ['line', /transmission line|distribution line|overhead line|\bohl\b|power cable|underground cable|\b(?:11|33|66|110|132|220|230|400)\s?kv\b/i], ['power', /electri|power (?:supply|grid|network|distribution|system)|grid|energy|meter/i]];
+var LIVE_BID = /invitation for bids|request for bids|request for quotations?|invitation for prequalification|specific procurement notice|invitation to tender|tender notice/i;
+var ISO3 = { POL: 'Poland', DEU: 'Germany', FRA: 'France', ITA: 'Italy', ESP: 'Spain', PRT: 'Portugal', NLD: 'Netherlands', BEL: 'Belgium', AUT: 'Austria', CZE: 'Czechia', SVK: 'Slovakia', HUN: 'Hungary', ROU: 'Romania', BGR: 'Bulgaria', GRC: 'Greece', HRV: 'Croatia', SVN: 'Slovenia', SWE: 'Sweden', FIN: 'Finland', DNK: 'Denmark', IRL: 'Ireland', EST: 'Estonia', LVA: 'Latvia', LTU: 'Lithuania', LUX: 'Luxembourg', CYP: 'Cyprus', MLT: 'Malta', NOR: 'Norway', CHE: 'Switzerland', ISL: 'Iceland', GBR: 'United Kingdom', SRB: 'Serbia', MKD: 'North Macedonia', ALB: 'Albania', MNE: 'Montenegro', BIH: 'Bosnia and Herzegovina', UKR: 'Ukraine', MDA: 'Moldova', TUR: 'Türkiye', GEO: 'Georgia', ARM: 'Armenia', XKX: 'Kosovo', LIE: 'Liechtenstein' };
+var LIVE_LINKS = [
+  ['World Bank 조달 공고', 'https://projects.worldbank.org/en/projects-operations/procurement?srce=both', '세계은행 차관 사업 · 개도국 전력청 입찰'],
+  ['ADB 조달 공고', 'https://www.adb.org/projects/tenders', '아시아개발은행 사업 · 아시아 전력 입찰'],
+  ['EU TED', 'https://ted.europa.eu/en/', '유럽연합 공공조달 · 변압기 CPV 31170000'],
+  ['UNGM', 'https://www.ungm.org/Public/Notice', 'UN 기구 조달 공고'],
+  ['KOTRA 해외시장뉴스 · 해외조달', 'https://dream.kotra.or.kr/', '국가별 조달 정보 · 한국 기업 대상'],
+  ['조달청 해외조달시장 정보', 'https://www.pps.go.kr/', '해외 조달시장 진출 지원']
+];
+function liveCat(t){ for(var i = 0; i < LIVE_CAT_RE.length; i++) if(LIVE_CAT_RE[i][1].test(t)) return LIVE_CAT_RE[i][0]; return null; }
+function liveDay(s){ var m = String(s || '').match(/(\d{4})-(\d{2})-(\d{2})/); return m ? m[1] + '-' + m[2] + '-' + m[3] : null; }
+function liveStrip(h){ return String(h || '').replace(/<(?:br|\/p|\/div|\/li|\/tr|\/h\d)\s*\/?>/gi, '\n').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/[ \t]+/g, ' ').replace(/\n\s*\n\s*\n+/g, '\n\n').trim(); }
+function liveFromWb(n){
+  var desc = String(n.bid_description || '').replace(/\s+/g, ' ').trim(), dl = liveDay(n.submission_deadline_date);
+  if(!LIVE_BID.test(n.notice_type || '') || !dl || BL.dday(dl) < 0) return null;
+  var cat = liveCat(desc + ' ' + (n.project_name || '')); if(!cat) return null;
+  return { id: 'wb-' + n.id, src: 'World Bank', title: desc || n.project_name, buyer: n.contact_organization || '', country: n.project_ctry_name || '', deadline: dl, deadlineTime: n.submission_deadline_time || '', type: n.notice_type || '', ref: n.bid_reference_no || '', cat: cat,
+    url: 'https://projects.worldbank.org/en/projects-operations/procurement-detail/' + n.id, text: n.notice_text ? liveStrip(n.notice_text).slice(0, 20000) : '' };
+}
+function liveWhy(){
+  var inClaude = !!(window.claude && typeof window.claude.use === 'function') || /claude\.ai|claudeusercontent/i.test(location.hostname + ' ' + document.referrer);
+  if(inClaude) return '<b>Claude 안에서 여는 미리보기 화면</b>은 보안 때문에 세계은행 · EU 같은 외부 사이트에 접속할 수 없어요. GitHub Pages로 배포한 사이트에서는 실제 공고가 마감이 빠른 순으로 나와요.';
+  if(location.protocol === 'file:') return '내 컴퓨터에서 파일로 직접 연 화면이라 공고 파일을 읽을 수 없어요. GitHub Pages로 배포한 주소로 열어 주세요.';
+  if(LIVE.feed === 'empty') return '공고 파일(tenders.json)이 아직 비어 있어요. GitHub 저장소의 <b>Actions 탭 → Update tenders → Run workflow</b>를 한 번 실행하면 1~3분 뒤부터 공고가 나와요. 이후에는 6시간마다 자동으로 새로 받아요.';
+  if(LIVE.feed === 'missing') return '공고 파일(tenders.json)이 사이트에 없어요. 배포 폴더의 tenders.json과 .github 폴더를 함께 올린 뒤 Actions 탭에서 Update tenders를 실행해 주세요.';
+  return '인터넷 연결이 불안정하거나 조달 사이트가 잠시 응답하지 않아요. 잠시 후 새로고침을 눌러 주세요.';
+}
+function liveFetch(url, ms){ var ctl = typeof AbortController === 'function' ? new AbortController() : null; var t = setTimeout(function(){ if(ctl) ctl.abort(); }, ms); return fetch(url, ctl ? { signal: ctl.signal, cache: 'no-store' } : { cache: 'no-store' }).then(function(r){ clearTimeout(t); if(!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }, function(e){ clearTimeout(t); throw e; }); }
+function loadLive(force){
+  if(LIVE.status === 'loading' || (LIVE.status === 'ok' && !force)) return;
+  LIVE.status = 'loading'; LIVE.err = ''; if(S.view === 'live') renderMain();
+  LIVE.feed = '';
+  liveFetch('tenders.json?t=' + Date.now(), 8000).then(function(j){
+    if(!j || !Array.isArray(j.items) || !j.updatedAt){ LIVE.feed = 'empty'; throw new Error('empty'); }
+    j.items.sort(function(a, b){ return a.deadline < b.deadline ? -1 : a.deadline > b.deadline ? 1 : 0; });
+    return { updatedAt: j.updatedAt, sources: j.sources || {}, items: j.items.filter(function(i){ return i.deadline && BL.dday(i.deadline) >= 0; }), via: 'feed' };
+  }).catch(function(e){
+    if(!LIVE.feed) LIVE.feed = /HTTP 404/.test(String(e && e.message)) ? 'missing' : 'error';
+    var terms = ['transformer', 'substation', 'switchgear', 'transmission line'];
+    return Promise.all(terms.map(function(t){ return liveFetch('https://search.worldbank.org/api/v2/procnotices?format=json&rows=60&os=0&qterm=' + encodeURIComponent(t), 12000).then(function(j){ var l = j && j.procnotices; return Array.isArray(l) ? l : l ? Object.keys(l).map(function(k){ return l[k]; }) : []; }, function(){ return null; }); })).then(function(res){
+      if(res.every(function(r){ return r === null; })) throw new Error('blocked');
+      var seen = {}, items = [];
+      res.forEach(function(list){ (list || []).forEach(function(n){ var m = liveFromWb(n); if(m && !seen[m.id]){ seen[m.id] = 1; items.push(m); } }); });
+      items.sort(function(a, b){ return a.deadline < b.deadline ? -1 : a.deadline > b.deadline ? 1 : 0; });
+      return { updatedAt: new Date().toISOString(), sources: { 'World Bank': { ok: true, count: items.length } }, items: items, via: 'direct' };
+    });
+  }).then(function(d){ LIVE.data = d; LIVE.via = d.via; LIVE.status = 'ok'; syncWatch(); renderRail(); if(S.view === 'live') renderMain(); },
+    function(e){ LIVE.status = 'error'; LIVE.err = String(e && e.message || e); if(S.view === 'live') renderMain(); });
+}
+function syncWatch(){ if(!LIVE.data) return; var by = {}; LIVE.data.items.forEach(function(i){ by[i.id] = i; }); var ch = false; watched.forEach(function(w, k){ var n = by[w.id]; if(n && n.deadline !== w.deadline){ watched[k] = Object.assign({}, w, { deadline: n.deadline }); ch = true; } }); if(ch) saveWatch(); }
+function liveFiltered(){
+  var items = LIVE.data ? LIVE.data.items : [], q = LIVE.q.trim().toLowerCase();
+  return items.filter(function(i){
+    if(LIVE.cat !== 'all' && i.cat !== LIVE.cat) return false;
+    if(LIVE.country !== 'all' && liveCountry(i) !== LIVE.country) return false;
+    if(LIVE.soon && BL.dday(i.deadline) > 21) return false;
+    if(q && (i.title + ' ' + i.buyer + ' ' + i.country + ' ' + liveCountry(i) + ' ' + i.ref).toLowerCase().indexOf(q) < 0) return false;
+    return true;
+  });
+}
+function refocus(sel){ try { var el = $(sel); if(el){ el.focus({ preventScroll: true }); return true; } } catch(e){} return false; }
+function liveEnDate(s){ var p = String(s).split('-').map(Number); return p[2] + ' ' + ['January','February','March','April','May','June','July','August','September','October','November','December'][p[1] - 1] + ' ' + p[0]; }
+function liveCountry(i){ return ISO3[i.country] || i.country || '-'; }
+function isWatched(id){ return watched.some(function(w){ return w.id === id; }); }
+function liveRow(i){
+  var d = BL.dday(i.deadline), w = isWatched(i.id), cn = (LIVE_CATS.filter(function(c){ return c[0] === i.cat; })[0] || ['', '기타'])[1];
+  return '<div class="list-row live-row"><div class="gap8" style="gap:14px;flex:1 1 320px;flex-wrap:nowrap;align-items:flex-start">' + ddChip(d) + '<div style="min-width:0">' +
+    '<p class="t" style="overflow-wrap:anywhere">' + esc(i.title) + '</p>' +
+    '<p class="s2">' + [esc(i.buyer), esc(liveCountry(i)), '<span style="white-space:nowrap">마감 ' + BL.fmtDate(i.deadline) + (i.deadlineTime ? ' ' + esc(i.deadlineTime) + ' (현지 시각)' : '') + '</span>'].filter(Boolean).join(' · ') + '</p>' +
+    '<p class="s2" style="margin-top:6px"><span class="lv-tag">' + esc(i.src) + '</span><span class="lv-tag">' + cn + '</span>' + (i.ref ? '<span class="mono" style="font-size:12px;overflow-wrap:anywhere">' + esc(i.ref) + '</span>' : '') + '</p>' +
+  '</div></div><div class="gap8 live-act">' +
+    '<a class="btn-a btn-sm" href="' + esc(i.url) + '" target="_blank" rel="noopener noreferrer">원문 보기</a>' +
+    (i.text ? '<button type="button" class="btn-a btn-sm blue" data-act="liveAnalyze" data-id="' + esc(i.id) + '">분석하기</button>' : '') +
+    '<button type="button" class="btn-a btn-sm" data-act="liveWatch" data-id="' + esc(i.id) + '" aria-pressed="' + w + '">' + (w ? '✓ 일정에 추가됨' : '일정에 추가') + '</button>' +
+  '</div></div>';
+}
+function viewLive(){
+  if(LIVE.status === 'idle') setTimeout(function(){ loadLive(); }, 0);
+  var head = '<div class="between" style="align-items:flex-end;gap:12px"><div><h1 class="ttl">해외 전력 입찰 공고</h1><p class="lede-a">세계은행 · EU 공공조달(TED)에 올라온 변압기 · 변전소 · 개폐기 · 송배전 입찰 중 마감 전인 공고예요.</p></div>' +
+    (LIVE.status === 'ok' || LIVE.status === 'error' ? '<button type="button" class="btn-a btn-sm" data-act="liveReload">새로고침</button>' : '') + '</div>';
+  if(LIVE.status === 'loading' || LIVE.status === 'idle') return head + '<div class="card pad" style="margin-top:22px"><div class="gap8"><span class="spin" aria-hidden="true"></span><span>공고를 불러오고 있어요</span></div></div>';
+  if(LIVE.status === 'error') return head +
+    '<div class="card pad" style="margin-top:22px;border-color:#F0D48A;background:#FFFBEF"><p style="font-weight:600">지금은 공고 목록을 불러올 수 없어요</p><p class="hint" style="margin-top:6px;line-height:1.7">' + liveWhy() + '</p><p class="hint" style="margin-top:6px;line-height:1.7">그동안은 아래 공식 조달 사이트에서 찾은 공고를 "새 분석 → 텍스트 붙여넣기"로 바로 분석할 수 있어요.</p></div>' +
+    watchCard() + '<p style="font-weight:600;margin:26px 0 10px">공식 조달 공고 사이트</p><div class="card">' + LIVE_LINKS.map(function(l){ return '<div class="list-row"><div style="min-width:0;flex:1 1 240px"><p class="t">' + l[0] + '</p><p class="s2">' + l[2] + '</p></div><a class="btn-a btn-sm" href="' + l[1] + '" target="_blank" rel="noopener noreferrer">사이트 열기</a></div>'; }).join('') + '</div>';
+  var D = LIVE.data, list = liveFiltered(), countries = {};
+  D.items.forEach(function(i){ countries[liveCountry(i)] = (countries[liveCountry(i)] || 0) + 1; });
+  var srcTxt = Object.keys(D.sources || {}).map(function(k){ var s = D.sources[k], n = D.items.filter(function(i){ return i.src === k; }).length; return k + ' ' + (s.ok === false && !s.count ? '오류' : n + '건') + (s.carried ? '(이전 목록 유지)' : ''); }).join(' · ');
+  var upd = new Date(D.updatedAt), ageH = (Date.now() - upd) / 3600e3;
+  return head +
+    '<p class="hint" style="margin-top:10px">' + (isNaN(upd) ? '' : '업데이트 ' + upd.getFullYear() + '.' + (upd.getMonth() + 1) + '.' + upd.getDate() + ' ' + String(upd.getHours()).padStart(2, '0') + ':' + String(upd.getMinutes()).padStart(2, '0') + ' · ') + esc(srcTxt) + (LIVE.via === 'direct' ? ' · 세계은행에서 바로 받아옴' : '') + '</p>' +
+    (LIVE.via === 'feed' && ageH > 30 ? '<p class="hint" style="margin-top:6px;color:#A15C00">공고 목록이 ' + Math.max(1, Math.floor(ageH / 24)) + '일 전 기준이에요. 최신 공고와 마감은 "원문 보기"로 확인하세요.</p>' : '') +
+    '<div class="gap8 live-cats" style="margin-top:16px" role="group" aria-label="품목">' + LIVE_CATS.map(function(c){ var n = c[0] === 'all' ? D.items.length : D.items.filter(function(i){ return i.cat === c[0]; }).length; return '<button type="button" class="chip' + (LIVE.cat === c[0] ? ' on' : '') + '" data-act="liveCat" data-k="' + c[0] + '" aria-pressed="' + (LIVE.cat === c[0]) + '">' + c[1] + ' <span class="hint" style="display:inline">' + n + '</span></button>'; }).join('') + '</div>' +
+    '<div class="gap8" style="margin-top:12px"><label class="sr" for="liveQ">공고 검색</label><input class="ainput" id="liveQ" type="search" placeholder="검색 · 예: 132 kV, Kenya, transformer" value="' + esc(LIVE.q) + '" style="flex:1 1 240px">' +
+      '<label class="sr" for="liveCountry">국가</label><select class="ainput" id="liveCountry" style="flex:0 1 200px"><option value="all">모든 국가</option>' + Object.keys(countries).sort().map(function(c){ return '<option value="' + esc(c) + '"' + (LIVE.country === c ? ' selected' : '') + '>' + esc(c) + ' (' + countries[c] + ')</option>'; }).join('') + '</select>' +
+      '<label class="chk" for="liveSoon" style="margin:0"><input type="checkbox" id="liveSoon"' + (LIVE.soon ? ' checked' : '') + '><span>마감 3주 이내</span></label></div>' +
+    '<div class="card" style="margin-top:16px">' + (list.length ? list.map(liveRow).join('') : '<p class="empty">' + (D.items.length ? '조건에 맞는 공고가 없어요. 필터를 바꿔 보세요.' : '지금은 마감 전인 공고가 없어요. 잠시 후 새로고침해 보세요.') + '</p>') + '</div>' +
+    '<p class="hint" style="margin-top:12px;line-height:1.7">공고 내용과 마감 시각은 발주처 원문이 기준이에요. 입찰 전에 "원문 보기"로 꼭 확인하세요. "분석하기"는 세계은행 공고 원문이 있을 때만 보여요.</p>' + watchCard();
+}
+function watchCard(){
+  var mine = watched.filter(function(w){ return BL.dday(w.deadline) >= 0; });
+  if(!mine.length) return '';
+  return '<p style="font-weight:600;margin:28px 0 10px">일정에 추가한 공고 ' + mine.length + '건</p><div class="card">' + mine.map(function(w){ return '<div class="list-row"><div class="gap8" style="gap:14px;flex:1 1 260px;flex-wrap:nowrap">' + ddChip(BL.dday(w.deadline)) + '<div style="min-width:0"><p class="t" style="overflow-wrap:anywhere">' + esc(w.title) + '</p><p class="s2">' + esc([w.buyer, liveCountry(w), BL.fmtDate(w.deadline)].filter(Boolean).join(' · ')) + '</p></div></div><div class="gap8"><a class="btn-a btn-sm" href="' + esc(w.url) + '" target="_blank" rel="noopener noreferrer">원문 보기</a><button type="button" class="btn-a btn-sm" data-act="liveWatch" data-id="' + esc(w.id) + '">빼기</button></div></div>'; }).join('') + '</div>';
+}
+function liveItem(id){ var l = LIVE.data ? LIVE.data.items : []; for(var i = 0; i < l.length; i++) if(l[i].id === id) return l[i]; for(var j = 0; j < watched.length; j++) if(watched[j].id === id) return watched[j]; return null; }
+function toggleWatch(id){
+  if(isWatched(id)){ watched = watched.filter(function(w){ return w.id !== id; }); toast('입찰 일정에서 뺐어요'); }
+  else { var i = liveItem(id); if(!i) return; watched.push({ id: i.id, src: i.src, title: i.title, buyer: i.buyer, country: i.country, deadline: i.deadline, url: i.url, ref: i.ref }); toast('입찰 일정에 추가했어요 · 마감 ' + BL.fmtDate(i.deadline)); }
+  saveWatch(); renderRail(); renderMain();
+}
+
 function viewSettings(){
   var w = settings.weights, t = settings.thresholds, p = settings.profile;
   function rng(k, label){ return '<div><label class="alabel" for="w-' + k + '">' + label + '</label><div class="range-row"><input type="range" id="w-' + k + '" min="0" max="60" step="5" value="' + w[k] + '" data-w="' + k + '"><output for="w-' + k + '" id="wo-' + k + '">' + w[k] + '</output></div></div>'; }
@@ -2422,10 +2640,10 @@ function viewSettings(){
       '</div>' +
       '<div class="card pad stack"><p style="font-weight:600">계정</p><p style="font-size:14px">' + esc(settings.profile.name || session.name) + ' <span class="hint" style="display:inline">· ' + esc(session.email) + (session.demo ? ' · 데모 계정' : '') + '</span></p><div class="gap8"><button type="button" class="btn-a" data-go="intro">서비스 소개 보기</button><button type="button" class="btn-a" data-act="logout">로그아웃</button></div></div>' +
       '<div class="card pad stack"><p style="font-weight:600">데이터</p><p class="hint" style="margin:0">분석 기록과 표준품은 이 브라우저에만 저장돼요. 다른 기기에서는 보이지 않아요.</p>' +
-        (S.pendingReset ? '<div class="confirm">분석 기록, 표준품, 설정을 모두 지우고 처음 상태로 돌릴까요?<button type="button" class="btn-a danger btn-sm" data-act="resetYes">모두 지우기</button><button type="button" class="btn-a btn-sm" data-act="resetNo">취소</button></div>'
+        (S.pendingReset ? '<div class="confirm">분석 기록, 표준품, 설정, 일정에 추가한 해외 공고를 모두 지우고 처음 상태로 돌릴까요?<button type="button" class="btn-a danger btn-sm" data-act="resetYes">모두 지우기</button><button type="button" class="btn-a btn-sm" data-act="resetNo">취소</button></div>'
           : '<div class="gap8"><button type="button" class="btn-a" data-act="addSample">샘플 분석 다시 추가</button><button type="button" class="btn-a danger" data-act="reset">모든 데이터 지우기</button></div>') +
-        '<div style="border-top:1px solid #EDF2F8;padding-top:14px"><p style="font-weight:600;font-size:14px">백업 · 다른 기기로 옮기기</p><p class="hint" style="margin:4px 0 10px">분석 ' + analyses.length + '건 · 표준품 ' + stds.length + '개 · 설정을 파일 하나로 저장하고, 다른 브라우저에서 불러올 수 있어요.</p>' +
-          (S.pendingImport ? '<div class="confirm" style="color:var(--ink)">' + esc(S.pendingImport.name) + ' · 분석 ' + S.pendingImport.data.analyses.length + '건 · 표준품 ' + S.pendingImport.data.standards.length + '개를 불러올까요? 지금 데이터는 바뀌어요.<button type="button" class="btn-a blue btn-sm" data-act="importYes">불러오기</button><button type="button" class="btn-a btn-sm" data-act="importNo">취소</button></div>'
+        '<div style="border-top:1px solid #EDF2F8;padding-top:14px"><p style="font-weight:600;font-size:14px">백업 · 다른 기기로 옮기기</p><p class="hint" style="margin:4px 0 10px">분석 ' + analyses.length + '건 · 표준품 ' + stds.length + '개 · 설정' + (watched.length ? ' · 일정에 추가한 해외 공고 ' + watched.length + '건' : '') + '을 파일 하나로 저장하고, 다른 브라우저에서 불러올 수 있어요.</p>' +
+          (S.pendingImport ? '<div class="confirm" style="color:var(--ink)">' + esc(S.pendingImport.name) + ' · 분석 ' + S.pendingImport.data.analyses.length + '건 · 표준품 ' + S.pendingImport.data.standards.length + '개' + (Array.isArray(S.pendingImport.data.watched) && S.pendingImport.data.watched.length ? ' · 해외 공고 ' + S.pendingImport.data.watched.length + '건' : '') + '를 불러올까요? 지금 데이터는 바뀌어요.<button type="button" class="btn-a blue btn-sm" data-act="importYes">불러오기</button><button type="button" class="btn-a btn-sm" data-act="importNo">취소</button></div>'
             : '<div class="gap8"><button type="button" class="btn-a" data-act="backup">백업 파일 저장</button><label class="btn-a" for="importIn" style="cursor:pointer">백업 불러오기</label><input id="importIn" type="file" accept=".json,application/json" class="sr"></div>') +
           '<p class="err" id="importErr" role="alert" style="color:var(--no);margin-top:6px"></p></div>' +
       '</div>' +
@@ -2440,19 +2658,65 @@ function tableRows(an){
   });
 }
 var HEAD = ['그룹','항목','RFP 요구','자사 표준품','판정','비고','페이지','원문','추출 방식','메모'];
-function csvOf(an){ var all = [HEAD].concat(tableRows(an)); return '﻿' + all.map(function(r){ return r.map(function(c){ var s = String(c == null ? '' : c); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; }).join(','); }).join('\r\n'); }
+function csvOf(an){ var ev = evalOf(an), st = getStd(an.stdId); var all = [['분석', titleOf(an)], ['판정', VERDICT[ev.verdict].t + ' · ' + ev.score + '점'], ['비교 기준', st ? st.name : ''], []].concat([HEAD], tableRows(an)); return '﻿' + all.map(function(r){ return r.map(function(c){ var s = String(c == null ? '' : c); if(/^[=+\-@\t\r]/.test(s) && s !== '-' && s !== '−') s = "'" + s; return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; }).join(','); }).join('\r\n'); }
 function fileBase(an){ return 'BidLens_' + shortName(an).replace(/\.(pdf|txt).*$/i, '').replace(/[^\w\-가-힣]+/g, '_').slice(0, 60); }
+var TR_LANGS = [['fr','프랑스어','French'],['es','스페인어','Spanish'],['pt','포르투갈어','Portuguese'],['ar','아랍어','Arabic'],['ru','러시아어','Russian'],['vi','베트남어','Vietnamese'],['id','인도네시아어','Indonesian'],['tr','튀르키예어','Turkish']];
+function trBlock(an){
+  var tr = S.trFor === an.id ? S.tr : null, lang = S.trLang || 'fr';
+  return '<div style="border-top:1px solid #EDF2F8;padding-top:14px"><p style="font-weight:600;font-size:14px">현지어 번역 <span class="hint" style="display:inline;font-weight:400">참고용</span></p>' +
+    '<p class="hint" style="margin-top:4px;line-height:1.6">프랑스어권 · 스페인어권 발주처처럼 영어가 낯선 담당자에게 보낼 때 함께 붙이거나 내용을 확인할 때 쓰세요. 공식 질의 언어는 입찰안내서(ITB)의 "Language of Bid" 조항을 따르세요.</p>' +
+    '<div class="gap8" style="margin-top:10px"><label class="sr" for="trLang">번역할 언어</label><select class="aselect" id="trLang" style="width:auto">' + TR_LANGS.map(function(l){ return '<option value="' + l[0] + '"' + (l[0] === lang ? ' selected' : '') + '>' + l[1] + '</option>'; }).join('') + '</select>' +
+    '<button type="button" class="btn-a" data-act="translate"' + (S.trBusy ? ' disabled' : '') + '>' + (S.trBusy ? '번역 중…' : S.ai ? '번역하기' : 'Google 번역에서 열기') + '</button></div>' +
+    (tr ? '<label class="alabel" for="trTa" style="margin-top:12px">' + esc(tr.name) + ' 번역 (Claude · 원문과 꼭 대조하세요)</label><textarea class="ainput" id="trTa" rows="12" style="font-family:var(--f-sans);line-height:1.6"' + (tr.lang === 'ar' ? ' dir="rtl"' : '') + ' readonly>' + esc(tr.text) + '</textarea><div class="gap8" style="margin-top:8px"><button type="button" class="btn-a btn-sm" data-act="copyTr">번역 복사</button><button type="button" class="btn-a btn-sm" data-act="saveTr">텍스트 파일로 저장</button></div>' : '') +
+    '</div>';
+}
+async function translateLetter(an){
+  var lang = ($('#trLang') || {}).value || 'fr', L = TR_LANGS.filter(function(l){ return l[0] === lang; })[0], text = ($('#letterTa') || {}).value || letterTextOf(an);
+  S.trLang = lang;
+  if(!S.ai){
+    if(text.length > 4500){ copyText(text, '본문이 길어 링크에 다 담기지 않아요. 본문을 복사했으니 Google 번역 창에 붙여넣어 주세요.'); window.open('https://translate.google.com/?sl=en&tl=' + lang + '&op=translate', '_blank', 'noopener'); return; }
+    window.open('https://translate.google.com/?sl=en&tl=' + lang + '&text=' + encodeURIComponent(text) + '&op=translate', '_blank', 'noopener'); return;
+  }
+  S.trBusy = true; renderMain(); refocus('[data-act="translate"]');
+  try {
+    var res = await S.ai('Translate the following English business letter (a clarification request for a power transformer tender) into ' + L[2] + '. Use a formal business register. Keep the item numbering, clause and page references, numbers, units, standards (IEC/IEEE), company names and bracketed placeholders exactly as written. Output only the translated letter, nothing else.\n\n' + text, { modelTier: 'default' });
+    S.tr = { lang: lang, name: L[1], text: String(res && res.text || '').trim() }; S.trFor = an.id;
+    if(!S.tr.text) throw new Error('empty');
+    toast(L[1] + ' 번역을 만들었어요');
+  } catch(e){ toast(e && e.code === 'not_granted' ? 'Claude 사용을 허용하지 않아 번역할 수 없어요.' : e && e.code === 'rate_limited' ? '요청이 많아요. 잠시 후 다시 눌러 주세요.' : '번역하지 못했어요. 잠시 후 다시 시도해 주세요.'); }
+  S.trBusy = false; renderMain(); refocus('#trTa') || refocus('[data-act="translate"]');
+}
+function pdfSafe(t){ return String(t).replace(/[\u2212\u2010\u2011]/g, '-').replace(/[\u2009\u202F\u00A0]/g, ' ').replace(/\u2192/g, '->').replace(/\u2265/g, '>=').replace(/\u2264/g, '<='); }
+async function exportLetterPdf(an){
+  var text = pdfSafe(($('#letterTa') || {}).value || letterTextOf(an));
+  try { if(!window.PDFLib) await loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js'); }
+  catch(e){ toast('PDF 도구를 불러오지 못했어요. 인터넷 연결을 확인하거나 텍스트 파일로 저장해 주세요.'); return; }
+  var P = window.PDFLib, doc = await P.PDFDocument.create(), font = await doc.embedFont(P.StandardFonts.Helvetica), bold = await doc.embedFont(P.StandardFonts.HelveticaBold);
+  doc.setTitle('Request for Clarification' + (an.fields.rfpNo ? ' - ' + an.fields.rfpNo.v.text : '')); doc.setCreator('BidLens');
+  var W = 595.28, H = 841.89, M = 64, size = 10.5, lh = 15.5, maxW = W - 2 * M, lost = 0;
+  function ok(ch){ try { font.widthOfTextAtSize(ch, size); return true; } catch(e){ return false; } }
+  function clean(l){ return Array.from(l).map(function(ch){ if(ok(ch)) return ch; lost++; return '?'; }).join(''); }
+  function wrap(l, f){ var words = l.split(/(\s+)/), out = [], cur = ''; words.forEach(function(w){ var nx = cur + w; if(f.widthOfTextAtSize(nx, size) <= maxW || !cur.trim()){ cur = nx; } else { out.push(cur.replace(/\s+$/, '')); cur = w.replace(/^\s+/, ''); } while(f.widthOfTextAtSize(cur, size) > maxW && cur.length > 1){ var k = cur.length; while(k > 1 && f.widthOfTextAtSize(cur.slice(0, k), size) > maxW) k--; out.push(cur.slice(0, k)); cur = cur.slice(k); } }); out.push(cur.replace(/\s+$/, '')); return out; }
+  var lines = []; text.split('\n').forEach(function(raw){ var l = clean(raw), isHead = /^(?:Subject|Ref|Re):/i.test(l) || /^\d+\.\s+[^—]{2,60}\s—/.test(l); var f = isHead && /^(?:Subject|Ref|Re):/i.test(l) ? bold : font; if(!l.trim()){ lines.push({ t: '', f: font }); return; } wrap(l, f).forEach(function(x){ lines.push({ t: x, f: f }); }); });
+  var page = null, y = 0, pages = [];
+  lines.forEach(function(ln){ if(!page || y < M + 30){ page = doc.addPage([W, H]); pages.push(page); y = H - M; } if(ln.t) page.drawText(ln.t, { x: M, y: y, size: size, font: ln.f, color: P.rgb(0.1, 0.12, 0.16) }); y -= lh; });
+  pages.forEach(function(pg, i){ var ft = 'Page ' + (i + 1) + ' of ' + pages.length; pg.drawText(ft, { x: W - M - font.widthOfTextAtSize(ft, 8.5), y: 36, size: 8.5, font: font, color: P.rgb(0.45, 0.5, 0.58) }); });
+  var bytes = await doc.save();
+  var okd = await saveFile(fileBase(an) + '_Clarification.pdf', bytes);
+  if(okd && lost) toast('영문 PDF라 한글 등 ' + lost + '글자는 ?로 바뀌었어요. 서명 · 회사명을 영문으로 바꿔 주세요.');
+  if(!okd) toast('이 화면에서는 PDF를 저장할 수 없어요. 텍스트 파일로 저장해 주세요.');
+}
 async function saveFile(name, data){
   if(!S.downloads){
-    try { var mime = /\.xlsx$/.test(name) ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' : /\.json$/.test(name) ? 'application/json' : /\.csv$/.test(name) ? 'text/csv;charset=utf-8' : 'text/plain;charset=utf-8';
+    try { var mime = /\.xlsx$/.test(name) ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' : /\.json$/.test(name) ? 'application/json' : /\.pdf$/.test(name) ? 'application/pdf' : /\.csv$/.test(name) ? 'text/csv;charset=utf-8' : 'text/plain;charset=utf-8';
       var url = URL.createObjectURL(new Blob([data], { type: mime })), a = document.createElement('a'); a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){ URL.revokeObjectURL(url); }, 4000); toast('내려받기를 시작했어요 · ' + name); return true; }
     catch(e){ return false; }
   }
   try { await S.downloads.save({ filename: name, data: data }); toast('저장했어요 · ' + name); return true; }
   catch(e){ var c = e && e.code; toast(c === 'declined' ? '저장을 취소했어요.' : c === 'rate_limited' ? '저장 창이 이미 열려 있어요. 잠시 후 다시 눌러 주세요.' : c === 'rejected_extension' || c === 'extension_not_enabled' ? '이 형식은 여기서 저장할 수 없어요. CSV로 내보내 보세요.' : '파일을 저장하지 못했어요.'); return true; }
 }
-function letterTextOf(an){ var std = getStd(an.stdId); var ev = BL.evaluate(an, std, settings); return an.letterEdited && an.letterText != null ? an.letterText : BL.buildLetter(an, ev, std, an.letterSel || defaultSel(BL.letterCandidates(ev)), settings.profile); }
-function defaultSel(cands){ var quiet = ['typeTest','localAgent','iso','experience','employer','rfpNo','clarDeadline']; return cands.filter(function(r){ return !(r.c.st === 'ask' && !r.v && quiet.indexOf(r.def.k) >= 0); }).map(function(r){ return r.def.k; }); }
+function letterTextOf(an){ var std = getStd(an.stdId); var ev = BL.evaluate(an, std, settings); return an.letterEdited && an.letterText != null ? an.letterText : BL.buildLetter(an, ev, std, an.letterSel || defaultSel(BL.letterCandidates(ev), ev), settings.profile); }
+function defaultSel(cands, ev){ if(ev && ev.kind === 'reactor') return []; var quiet = ['typeTest','localAgent','iso','experience','employer','rfpNo','clarDeadline']; return cands.filter(function(r){ return !(r.c.st === 'ask' && !r.v && quiet.indexOf(r.def.k) >= 0); }).map(function(r){ return r.def.k; }); }
 async function exportXlsx(an){
   try { if(!window.XLSX) await loadScript('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'); }
   catch(e){ toast('엑셀 도구를 불러오지 못했어요. CSV로 내보내 주세요.'); return; }
@@ -2484,6 +2748,9 @@ async function exportXlsx(an){
 
 /* ---------------- Events ---------------- */
 function afterRender(){
+  $$('#main [data-edit], #main [data-edit-go], #main [data-ev]').forEach(function(b){ if(b.hasAttribute('aria-label')) return; var k = b.dataset.edit || b.dataset.editGo || b.dataset.ev, f = BL.FMAP[k]; if(!f) return; var txt = b.textContent.trim(); b.setAttribute('aria-label', f.label + ' ' + ('ev' in b.dataset ? '원문 근거 ' + txt : txt)); });
+  $$('.tabs [role="tab"]').forEach(function(t){ t.setAttribute('aria-controls', 'tabpanel'); });
+  var stab = $('.tabs [role="tab"][aria-selected="true"]'); if(stab){ var bar = stab.parentElement; if(bar.scrollWidth > bar.clientWidth){ if(S.tabScroll != null) bar.scrollLeft = S.tabScroll; var br = bar.getBoundingClientRect(), tr = stab.getBoundingClientRect(); if(tr.left < br.left + 8) bar.scrollLeft -= br.left + 24 - tr.left; else if(tr.right > br.right - 8) bar.scrollLeft += tr.right - br.right + 24; } S.tabScroll = bar.scrollLeft; bar.addEventListener('scroll', function(){ S.tabScroll = bar.scrollLeft; }, { passive: true }); }
   var drop = $('#drop');
   if(drop){
     ['dragenter','dragover'].forEach(function(t){ drop.addEventListener(t, function(e){ e.preventDefault(); drop.classList.add('over'); }); });
@@ -2491,27 +2758,35 @@ function afterRender(){
     drop.addEventListener('drop', function(e){ var fl = e.dataTransfer && e.dataTransfer.files; if(fl && fl.length) handleFiles(Array.prototype.slice.call(fl)); });
   }
   var fi = $('#fileIn'); if(fi) fi.addEventListener('change', function(){ var fl = Array.prototype.slice.call(fi.files || []); fi.value = ''; if(fl.length) handleFiles(fl); });
+  var lq = $('#liveQ'); if(lq){ var liveSearch = function(e){ if(e && e.isComposing) return; LIVE.q = lq.value; clearTimeout(LIVE.qt); LIVE.qt = setTimeout(function(){ var a = document.activeElement; if(a && a.id === 'liveQ' && LIVE.composing) return; renderMain(); var n = $('#liveQ'); if(n){ n.focus(); var e2 = n.value.length; try { n.setSelectionRange(e2, e2); } catch(x){} } }, 300); };
+    lq.addEventListener('compositionstart', function(){ LIVE.composing = true; }); lq.addEventListener('compositionend', function(){ LIVE.composing = false; liveSearch(); }); lq.addEventListener('input', liveSearch); }
+  var lc = $('#liveCountry'); if(lc) lc.addEventListener('change', function(){ LIVE.country = lc.value; renderMain(); refocus('#liveCountry'); });
+  var ls2 = $('#liveSoon'); if(ls2) ls2.addEventListener('change', function(){ LIVE.soon = ls2.checked; renderMain(); refocus('#liveSoon'); });
   var ss = $('#stdSel'); if(ss) ss.addEventListener('change', function(){ S.stdChoice = ss.value; });
   var ai = $('#aiChk'); if(ai) ai.addEventListener('change', function(){ S.aiOn = ai.checked; });
   var oc = $('#ocrChk'); if(oc) oc.addEventListener('change', function(){ S.ocrClaude = oc.checked; });
-  var rs = $('#resStd'); if(rs) rs.addEventListener('change', function(){ var an = current(); an.stdId = rs.value; if(!an.letterEdited) an.letterSel = null; saveAll(); renderMain(); toast('비교 기준을 바꿨어요 · ' + getStd(rs.value).name); });
+  var rs = $('#resStd'); if(rs) rs.addEventListener('change', function(){ var an = current(); an.stdId = rs.value; an.autoStd = false; if(!an.letterEdited) an.letterSel = null; saveAll(); renderMain(); refocus('#resStd'); toast('비교 기준을 바꿨어요 · ' + getStd(rs.value).name); });
   var lt = $('#letterTa'); if(lt) lt.addEventListener('input', function(){ var an = current(); var first = !an.letterEdited; an.letterText = lt.value; an.letterEdited = true; saveDebounced(); if(first){ $$('[data-lsel]').forEach(function(c){ c.disabled = true; }); var rb = $('#resetLetterBtn'); if(rb) rb.hidden = false; var lh = $('#letterHint'); if(lh) lh.textContent = '직접 고친 내용이 저장돼 있어요. 항목을 다시 고르려면 "초안 다시 만들기"를 누르세요.'; } });
   var si = $('#searchIn'); if(si){ si.addEventListener('input', function(){ S.search = si.value; var pos = si.selectionStart; renderMain(); var n = $('#searchIn'); if(n){ n.focus(); try { n.setSelectionRange(pos, pos); } catch(e){} } }); }
+  var hso = $('#hsort'); if(hso) hso.addEventListener('change', function(){ S.hs = hso.value; renderMain(); refocus('#hsort'); });
   var hq = $('#hq'); if(hq){ hq.addEventListener('input', function(){ S.hq = hq.value; var pos = hq.selectionStart; renderMain(); var n = $('#hq'); if(n){ n.focus(); try { n.setSelectionRange(pos, pos); } catch(e){} } }); }
-  var ii = $('#importIn'); if(ii) ii.addEventListener('change', function(){ var f = ii.files && ii.files[0]; ii.value = ''; if(!f) return; f.text().then(function(t){ var d; try { d = JSON.parse(t); } catch(e){ d = null; } if(!d || d.app !== 'BidLens' || !Array.isArray(d.analyses) || !Array.isArray(d.standards)){ var er = $('#importErr'); if(er) er.textContent = 'BidLens 백업 파일이 아니에요. 설정에서 저장한 .json 파일을 골라 주세요.'; return; } d.analyses = d.analyses.filter(function(a){ return a && a.id && a.fields && Array.isArray(a.pages || []); }); d.standards = d.standards.filter(function(x){ return x && x.id && x.hv && x.mva; }); S.pendingImport = { name: f.name, data: d }; renderMain(); }); });
+  var ii = $('#importIn'); if(ii) ii.addEventListener('change', function(){ var f = ii.files && ii.files[0]; ii.value = ''; if(!f) return; f.text().then(function(t){ var d; try { d = JSON.parse(t); } catch(e){ d = null; } if(!d || d.app !== 'BidLens' || !Array.isArray(d.analyses) || !Array.isArray(d.standards)){ var er = $('#importErr'); if(er) er.textContent = 'BidLens 백업 파일이 아니에요. 설정에서 저장한 .json 파일을 골라 주세요.'; return; } d.analyses = d.analyses.filter(function(a){ return a && typeof a === 'object' && a.id && a.fields && typeof a.fields === 'object' && (a.pages == null || Array.isArray(a.pages)); }).map(function(a){ a.id = String(a.id); a.pages = Array.isArray(a.pages) ? a.pages.filter(function(p){ return typeof p === 'string'; }) : []; a.notes = a.notes && typeof a.notes === 'object' ? a.notes : {}; a.done = a.done && typeof a.done === 'object' ? a.done : {}; a.tasks = Array.isArray(a.tasks) ? a.tasks : []; a.createdAt = +a.createdAt || Date.now(); a.name = String(a.name || a.title || '불러온 분석'); return a; });
+    d.standards = d.standards.filter(function(x){ return x && x.id && +x.hv > 0 && +x.mva > 0; }).map(function(x){ var b = JSON.parse(JSON.stringify(DEFAULT_STDS[0])); Object.keys(x).forEach(function(k){ if(x[k] != null) b[k] = x[k]; }); b.id = String(x.id); b.name = String(x.name || (b.hv + ' kV ' + b.mva + ' MVA')); if(!Array.isArray(b.cooling) || !b.cooling.length) b.cooling = ['ONAN']; if(!Array.isArray(b.stages) || !b.stages.length) b.stages = [b.mva]; return b; });
+    if(!d.analyses.length && !d.standards.length){ var er2 = $('#importErr'); if(er2) er2.textContent = '불러올 수 있는 분석이나 표준품이 없는 파일이에요.'; return; }
+    S.pendingImport = { name: f.name, data: d }; renderMain(); }); });
   var es = $('#evSel'); if(es) es.addEventListener('change', function(){ S.sel = es.value; renderMain(); });
   var na = $('#noteAdd'); if(na) na.addEventListener('change', function(){ if(!na.value) return; S.noteKeys = S.noteKeys || {}; S.noteKeys[na.value] = 1; var k = na.value; renderMain(); var n = $('#nt-' + k); if(n){ n.focus(); n.scrollIntoView({ block: 'center' }); } });
   $$('[data-note]').forEach(function(t){ t.addEventListener('input', function(){ var an = current(); var v = t.value; if(v.trim()) an.notes[t.dataset.note] = v; else delete an.notes[t.dataset.note]; saveDebounced(); var tb = $('[data-tab="notes"]'); if(tb){ var n = Object.keys(an.notes).length, c = $('.c', tb); if(n && !c){ c = document.createElement('span'); c.className = 'c'; tb.appendChild(c); } if(c){ if(n) c.textContent = n; else c.remove(); } } }); });
-  $$('[data-w]').forEach(function(r){ r.addEventListener('input', function(){ settings.weights[r.dataset.w] = +r.value; $('#wo-' + r.dataset.w).textContent = r.value; var w = settings.weights; $('#wsum').textContent = '합계 ' + (w.tech + w.cert + w.comm + w.time) + ' · 비율로 환산해 100점 만점으로 계산해요'; saveDebounced(); }); });
-  ['thBid','thRev'].forEach(function(id){ var el = $('#' + id); if(el) el.addEventListener('change', function(){ var v = Math.max(0, Math.min(100, Math.round(+el.value) || 0)); el.value = v; settings.thresholds[id === 'thBid' ? 'bid' : 'review'] = v; if(settings.thresholds.review > settings.thresholds.bid){ settings.thresholds.review = settings.thresholds.bid; $('#thRev').value = settings.thresholds.bid; } saveAll(); toast('판정 기준을 저장했어요'); }); });
+  $$('[data-w]').forEach(function(r){ r.addEventListener('input', function(){ settings.weights[r.dataset.w] = +r.value; $('#wo-' + r.dataset.w).textContent = r.value; var w = settings.weights; var tot = w.tech + w.cert + w.comm + w.time; $('#wsum').textContent = tot ? '합계 ' + tot + ' · 비율로 환산해 100점 만점으로 계산해요' : '가중치가 모두 0이면 기본 가중치로 계산해요'; saveDebounced(); }); });
+  ['thBid','thRev'].forEach(function(id){ var el = $('#' + id); if(el) el.addEventListener('change', function(){ var key = id === 'thBid' ? 'bid' : 'review'; if(el.value.trim() === '' || isNaN(+el.value)){ el.value = settings.thresholds[key]; toast('0~100 사이 숫자로 입력해 주세요'); return; } var raw = +el.value, v = Math.max(0, Math.min(100, Math.round(raw))); el.value = v; if(v !== raw) toast('0~100 사이 정수로 맞췄어요 · ' + v + '점'); var T = settings.thresholds; if(key === 'review' && v >= T.bid){ el.value = T.review; toast('검토 기준은 참여 기준(' + T.bid + '점)보다 낮아야 해요'); return; } T[key] = v; var moved = ''; if(T.review >= T.bid){ T.review = Math.max(0, T.bid - 1); $('#thRev').value = T.review; moved = ' · 검토 기준도 ' + T.review + '점으로 맞췄어요'; } saveAll(); if(v === raw || moved) toast('판정 기준을 저장했어요' + moved); }); });
   $$('[data-pf]').forEach(function(el){ el.addEventListener('input', function(){ settings.profile[el.dataset.pf] = el.value; saveDebounced(); }); });
-  var ef = $('[data-editform]'); if(ef){ var inp = $('input', ef); if(inp){ inp.focus(); if(inp.select && inp.type !== 'date') inp.select(); } ef.addEventListener('submit', function(e){ e.preventDefault(); var k = ef.dataset.editform; var v = BL.editValue(k, inp.value); if(!v){ S.editErr = '형식을 확인해 주세요. 예: ' + editHint(k); renderMain(); return; } var an = current(); var old = an.fields[k]; an.fields[k] = { v: v, page: old ? old.page : null, quote: old ? old.quote : '', by: 'manual', cands: old ? old.cands : undefined }; S.editKey = null; S.editErr = ''; if(!an.letterEdited) an.letterSel = null; saveAll(); renderRail(); renderMain(); toast(BL.FMAP[k].label + ' 값을 고쳤어요 · 판정을 다시 계산했어요'); }); }
+  var ef = $('[data-editform]'); if(ef){ var inp = $('input', ef); if(inp){ inp.focus(); if(inp.select && inp.type !== 'date') inp.select(); } ef.addEventListener('submit', function(e){ e.preventDefault(); var k = ef.dataset.editform; var v = BL.editValue(k, inp.value); if(!v){ S.editErr = '형식을 확인해 주세요. 예: ' + editHint(k); renderMain(); return; } var an = current(); var old = an.fields[k]; an.fields[k] = { v: v, page: old ? old.page : null, quote: old ? old.quote : '', by: 'manual', cands: old ? old.cands : undefined }; S.editKey = null; S.editErr = ''; if(!an.letterEdited) an.letterSel = null; saveAll(); renderRail(); renderMain(); var F2 = an.fields; toast(F2.clarDeadline && F2.bidDeadline && F2.clarDeadline.v.date > F2.bidDeadline.v.date && /Deadline$/.test(k) ? '질의 마감이 제출 마감보다 늦어요. 날짜를 다시 확인해 주세요' : BL.FMAP[k].label + ' 값을 고쳤어요 · 판정을 다시 계산했어요'); }); }
   var sf = $('#stdForm'); if(sf) sf.addEventListener('submit', function(e){ e.preventDefault(); saveStd(); });
-  var rf = $('#renameForm'); if(rf){ var ri = $('#renameIn'); ri.focus(); ri.select(); rf.addEventListener('submit', function(e){ e.preventDefault(); var v = ri.value.trim(); if(!v) return; current().title = v; S.renaming = false; saveAll(); renderMain(); toast('이름을 바꿨어요'); }); }
+  var rf = $('#renameForm'); if(rf){ var ri = $('#renameIn'); ri.focus(); ri.select(); rf.addEventListener('submit', function(e){ e.preventDefault(); var v = ri.value.trim(); if(!v){ ri.setAttribute('aria-invalid', 'true'); ri.focus(); toast('이름을 입력해 주세요'); return; } current().title = v.slice(0, 120); S.renaming = false; saveAll(); renderMain(); toast('이름을 바꿨어요'); }); }
   var tf = $('#taskForm'); if(tf) tf.addEventListener('submit', function(e){ e.preventDefault(); var v = $('#taskIn').value.trim(); if(!v) return; var an = current(); an.tasks = an.tasks || []; an.tasks.push({ id: uid(), t: v, done: false }); saveAll(); renderMain(); var n = $('#taskIn'); if(n) n.focus(); });
   var hl = $('#hlMark'); if(hl){ var box = $('#quoteBox'); if(box) box.scrollTop = Math.max(0, hl.offsetTop - box.offsetTop - 60); }
 }
-function editHint(k){ return { voltage: '154/22.9', capacity: '60 또는 60/80', frequency: '60', insulation: '유입식', cooling: 'ONAN/ONAF', bil: '650', impedance: '12.5', standard: 'IEC', delivery: '40 (주) 또는 9개월', warranty: '60 (개월) 또는 5년', ld: '0.5 주당, 상한 10', experience: '3건 5년', incoterms: 'DAP 현장', currency: 'USD', bidDeadline: '2026-11-06', clarDeadline: '2026-10-25', lossCap: 'USD 6500 1800', typeTest: 'KEMA 필수', iso: '필수', localAgent: '필수', priceAdj: '고정가', employer: '발주처 이름', rfpNo: '입찰번호', bidSecurity: '입찰가의 2%', payment: 'L/C 10/80/10' }[k] || '값 입력'; }
+function editHint(k){ return { voltage: '154/22.9', capacity: '60 또는 60/80', frequency: '60', insulation: '유입식', cooling: 'ONAN/ONAF', bil: '650', impedance: '12.5', standard: 'IEC', noise: '70 dB(A)', quantity: '2대', tap: '±10% 17탭', tempRise: '60/65 K', ambient: '40 °C', vector: 'YNd1', delivery: '40 (주) 또는 9개월', warranty: '60 (개월) 또는 5년', ld: '0.5 주당, 상한 10', experience: '3건 5년', incoterms: 'DAP 현장', currency: 'USD', bidDeadline: '2026-11-06', clarDeadline: '2026-10-25', lossCap: 'USD 6500 1800', typeTest: 'KEMA 필수', iso: '필수', localAgent: '필수', priceAdj: '고정가', employer: '발주처 이름', rfpNo: '입찰번호', bidSecurity: '입찰가의 2%', payment: 'L/C 10/80/10' }[k] || '값 입력'; }
 var saveTimer = null;
 function saveDebounced(){ clearTimeout(saveTimer); saveTimer = setTimeout(saveAll, 400); }
 function handleFiles(list){
@@ -2532,7 +2807,35 @@ function saveStd(){
   var L = { hv: '1차 전압', lv: '2차 전압', mva: '최종 용량', bil: 'LI(BIL)', z: '단락 임피던스', delivery: '공장 출하 납기', warranty: '보증기간', exp: '유사 납품 실적' };
   Object.keys(L).forEach(function(k){ if(s[k] == null) miss.push(L[k]); });
   if(!s.cooling.length) miss.push('냉각 방식');
-  if(miss.length){ $('#sfErr').textContent = miss.join(', ') + ' 항목을 입력해 주세요.'; return; }
+  $$('#stdForm [aria-invalid]').forEach(function(el){ el.removeAttribute('aria-invalid'); });
+  var FID = { name: 'sfName', hv: 'sfHv', lv: 'sfLv', mva: 'sfMva', bil: 'sfBil', z: 'sfZ', delivery: 'sfDel', warranty: 'sfWar', exp: 'sfExp' };
+  $$('#stdForm .ferr').forEach(function(x){ x.remove(); });
+  function fieldErr(id, msg){ var el = $('#' + id); if(!el) return; el.setAttribute('aria-invalid', 'true'); var p = document.createElement('p'); p.className = 'ferr'; p.id = id + '-err'; p.textContent = msg; el.setAttribute('aria-describedby', p.id); el.insertAdjacentElement('afterend', p); }
+  if(miss.length){ $('#sfErr').textContent = miss.join(', ') + ' 항목을 입력해 주세요.'; var mk = (!s.name ? ['name'] : []).concat(Object.keys(L).filter(function(k){ return s[k] == null; })); mk.forEach(function(k){ fieldErr(FID[k], '입력해 주세요'); }); if(!s.cooling.length){ var cb = $('[data-cool]'); if(cb){ var grp = cb.closest('div'); if(grp && !grp.querySelector('.ferr')) grp.insertAdjacentHTML('beforeend', '<p class="ferr">냉각 방식을 하나 이상 골라 주세요</p>'); } } var fe = mk.length ? $('#' + FID[mk[0]]) : $('[data-cool]'); if(fe) fe.focus(); return; }
+  var bad = [], yr = new Date().getFullYear();
+  function chk(id, ok, msg){ if(!ok){ bad.push({ id: id, msg: msg }); } }
+  chk('sfHv', s.hv > 0 && s.hv <= 1200, '1차 전압은 0보다 크고 1200 kV 이하로 입력해 주세요');
+  chk('sfLv', s.lv > 0 && s.lv < s.hv, '2차 전압은 0보다 크고 1차 전압보다 작아야 해요');
+  chk('sfMva', s.mva > 0 && s.mva <= 2000, '최종 용량은 0보다 크고 2000 MVA 이하로 입력해 주세요');
+  chk('sfBil', s.bil > 0 && s.bil <= 3000, 'LI(BIL)는 0보다 큰 값으로 입력해 주세요');
+  chk('sfZ', s.z >= 2 && s.z <= 25, '단락 임피던스는 2~25% 범위로 입력해 주세요');
+  chk('sfDel', s.delivery >= 0 && s.delivery % 1 === 0, '공장 출하 납기는 0 이상의 정수(주)로 입력해 주세요');
+  chk('sfWar', s.warranty > 0 && s.warranty <= 120, '보증기간은 1~120개월로 입력해 주세요');
+  chk('sfExp', s.exp >= 0 && s.exp % 1 === 0, '유사 납품 실적은 0 이상의 정수(건)로 입력해 주세요');
+  if(s.transit != null) chk('sfTr', s.transit >= 0 && s.transit % 1 === 0, '해상 운송 기간은 0 이상의 정수(주)로 입력해 주세요');
+  if(s.typeYear != null) chk('sfTY', s.typeYear >= 1950 && s.typeYear <= yr && s.typeYear % 1 === 0, '형식시험 연도는 1950~' + yr + ' 사이로 입력해 주세요');
+  if(s.noise != null) chk('sfNoise', s.noise >= 40 && s.noise <= 120, '소음은 40~120 dB 범위로 입력해 주세요');
+  if(s.tapRange != null) chk('sfTapR', s.tapRange > 0 && s.tapRange <= 30, '탭 범위는 0~30% 범위로 입력해 주세요');
+  if(s.nll != null) chk('sfNll', s.nll > 0, '무부하손은 0보다 큰 값으로 입력해 주세요');
+  if(s.ll != null) chk('sfLl', s.ll > 0, '부하손은 0보다 큰 값으로 입력해 주세요');
+  var rawSt = g('sfStages');
+  if(rawSt){ var parts = rawSt.split(/[\/,\s]+/).filter(Boolean), nums = parts.map(Number);
+    if(nums.some(function(x){ return !(x > 0); })) chk('sfStages', false, '냉각 단계별 용량은 45/60처럼 숫자로 입력해 주세요');
+    else if(nums.some(function(x, i){ return i && x <= nums[i - 1]; })) chk('sfStages', false, '냉각 단계별 용량은 작은 값부터 차례로 입력해 주세요 (예: 45/60)');
+    else if(s.mva > 0 && nums[nums.length - 1] !== s.mva) chk('sfStages', false, '냉각 단계별 용량의 마지막 값(' + nums[nums.length - 1] + ')이 최종 용량(' + s.mva + ' MVA)과 같아야 해요');
+    else s.stages = nums; }
+  else s.stages = s.mva > 0 ? [s.mva] : [];
+  if(bad.length){ bad.forEach(function(b){ fieldErr(b.id, b.msg); }); $('#sfErr').textContent = bad.map(function(b){ return b.msg; }).join(' · '); var f0 = $('#' + bad[0].id); if(f0) f0.focus(); return; }
   if(S.editingStd === 'new' || S.editingStd === 'draft' || S.editingStd.indexOf('copy:') === 0){ s.id = 'std-' + uid(); stds.push(s); }
   else { var old = getStd(S.editingStd); s.id = old.id; Object.keys(s).forEach(function(k){ old[k] = s[k]; }); old.example = false; }
   var wasDraft = S.editingStd === 'draft';
@@ -2558,26 +2861,33 @@ document.addEventListener('click', function(e){
   if(d.cand != null){ var an0 = current(); var f0 = an0.fields[S.sel]; var c0 = f0.cands[+d.cand]; an0.fields[S.sel] = { v: c0.v, page: c0.page, quote: c0.quote, by: 'rule', cands: f0.cands }; if(!an0.letterEdited) an0.letterSel = null; saveAll(); renderRail(); renderMain(); toast(BL.FMAP[S.sel].label + ' 값을 바꿨어요 · 판정을 다시 계산했어요'); return; }
   if(d.edit){ S.editKey = d.edit; S.editErr = ''; renderMain(); return; }
   if(d.editGo){ S.tab = 'compare'; S.group = 'all'; S.status = 'all'; S.editKey = d.editGo; S.editErr = ''; renderMain(); var ef = $('[data-editform]'); if(ef) ef.scrollIntoView({ block: 'center' }); return; }
-  if(d.del){ S.pendingDelete = d.del; renderMain(); return; }
+  if(d.del){ S.pendingDelete = d.del; S.focusTo = '[data-act="delNo"]'; renderMain(); return; }
   if(d.delYes){ analyses = analyses.filter(function(a){ return a.id !== d.delYes; }); if(S.currentId === d.delYes) S.currentId = analyses[0] ? analyses[0].id : null; S.pendingDelete = null; saveAll(); renderRail(); renderMain(); toast('분석을 삭제했어요'); return; }
   if(d.sedit){ S.editingStd = d.sedit; renderMain(); window.scrollTo(0, 0); return; }
   if(d.scopy){ S.editingStd = 'copy:' + d.scopy; renderMain(); window.scrollTo(0, 0); return; }
   if(d.sdef){ settings.defaultStd = d.sdef; saveAll(); renderMain(); toast('기본 표준품을 바꿨어요'); return; }
-  if(d.sdel){ S.pendingStdDelete = d.sdel; renderMain(); return; }
-  if(d.sdelYes){ stds = stds.filter(function(s){ return s.id !== d.sdelYes; }); if(settings.defaultStd === d.sdelYes) settings.defaultStd = stds[0].id; analyses.forEach(function(a){ if(a.stdId === d.sdelYes) a.stdId = settings.defaultStd; }); S.pendingStdDelete = null; saveAll(); renderRail(); renderMain(); toast('표준품을 삭제했어요'); return; }
+  if(d.sdel){ S.pendingStdDelete = d.sdel; S.focusTo = '[data-act="sdelNo"]'; renderMain(); return; }
+  if(d.sdelYes){ stds = stds.filter(function(s){ return s.id !== d.sdelYes; }); if(settings.defaultStd === d.sdelYes) settings.defaultStd = stds[0].id; analyses.forEach(function(a){ if(a.stdId === d.sdelYes) a.stdId = settings.defaultStd; }); if(S.stdChoice === d.sdelYes) S.stdChoice = 'auto'; S.pendingStdDelete = null; saveAll(); renderRail(); renderMain(); refocus('[data-act="stdNew"]'); toast('표준품을 삭제했어요'); return; }
   if(d.ctdel){ var an1 = current(); an1.tasks = an1.tasks.filter(function(x){ return x.id !== d.ctdel; }); saveAll(); renderMain(); return; }
   var act = d.act; if(!act) return;
   var an = current();
   switch(act){
+    case 'liveReload': loadLive(true); break;
+    case 'liveCat': LIVE.cat = d.k; renderMain(); refocus('[data-act="liveCat"][data-k="' + d.k + '"]'); break;
+    case 'liveWatch': toggleWatch(d.id); refocus('[data-act="liveWatch"][data-id="' + String(d.id).replace(/["\\]/g, '') + '"]') || refocus('[data-act="liveReload"]'); break;
+    case 'liveAnalyze': { var li = liveItem(d.id); if(!li || !li.text) break; var ex = analyses.filter(function(a){ return a.liveId === li.id; })[0]; if(ex){ S.currentId = ex.id; S.tab = 'summary'; setView('result'); toast('이미 분석한 공고예요 · 결과를 열었어요'); break; }
+      var hdr = ['Tender Title: ' + li.title, li.ref ? 'Bid Reference No.: ' + li.ref : '', li.buyer ? 'Employer: ' + li.buyer : '', li.country ? 'Country: ' + liveCountry(li) : '', 'Deadline for submission of bids: ' + liveEnDate(li.deadline) + (li.deadlineTime ? ' at ' + li.deadlineTime : ''), 'Source: ' + li.src + ' - ' + li.url].filter(Boolean).join('\n');
+      S.pendingLive = { id: li.id, title: li.title, url: li.url };
+      runAnalysis({ kind: 'text', name: (li.ref || li.title).slice(0, 60) + ' (' + li.src + ')', text: hdr + '\n\n' + li.text }); break; }
     case 'sample': runAnalysis({ kind: 'sample', name: 'APA-RFP-2026-0412.pdf (샘플)' }); break;
     case 'togglePaste': S.paste = !S.paste; renderMain(); if(S.paste){ var ta = $('#pasteText'); if(ta) ta.focus(); } break;
     case 'pasteInstead': S.paste = true; setView('new'); setTimeout(function(){ var ta = $('#pasteText'); if(ta){ ta.focus(); ta.scrollIntoView({ block: 'center' }); } }, 30); break;
     case 'runPaste': { var txt = $('#pasteText').value; if(txt.trim().length < 80){ $('#pasteErr').textContent = '80자 이상의 입찰서 텍스트를 붙여넣어 주세요. 공고문 한두 줄보다는 기술 사양 부분을 함께 넣으면 더 정확해요.'; $('#pasteText').focus(); return; } runAnalysis({ kind: 'text', name: $('#pasteName').value.trim() || '붙여넣은 입찰서', text: txt }); break; }
     case 'logout': session = null; LS.del('bl.session'); S.view = 'new'; go('intro'); toast('로그아웃했어요'); break;
-    case 'backup': { var data = JSON.stringify({ app: 'BidLens', version: 1, savedAt: new Date().toISOString(), analyses: analyses, standards: stds, settings: settings }, null, 0); saveFile('BidLens_backup_' + BL.iso(new Date()) + '.json', data).then(function(okd){ if(!okd) copyText(data, '파일 저장을 쓸 수 없어 백업 내용을 복사했어요. 메모장에 붙여 .json으로 저장하세요.', null, '이 화면에서는 파일 저장과 복사를 쓸 수 없어요. Claude 앱에서 열어 다시 시도해 주세요.'); }); break; }
+    case 'backup': { var data = JSON.stringify({ app: 'BidLens', version: 1, savedAt: new Date().toISOString(), analyses: analyses, standards: stds, settings: settings, watched: watched }, null, 0); saveFile('BidLens_backup_' + BL.iso(new Date()) + '.json', data).then(function(okd){ if(!okd) copyText(data, '파일 저장을 쓸 수 없어 백업 내용을 복사했어요. 메모장에 붙여 .json으로 저장하세요.', null, '이 화면에서는 파일 저장과 복사를 쓸 수 없어요. 다른 브라우저에서 다시 시도해 주세요.'); }); break; }
     case 'guideOff': settings.onboarded = true; saveAll(); renderMain(); break;
     case 'importNo': S.pendingImport = null; renderMain(); break;
-    case 'importYes': { var dd = S.pendingImport.data; analyses = dd.analyses; stds = dd.standards.length ? dd.standards : stds; if(dd.settings) settings = Object.assign({}, DEFAULT_SETTINGS, dd.settings, { weights: Object.assign({}, DEFAULT_SETTINGS.weights, dd.settings.weights || {}), thresholds: Object.assign({}, DEFAULT_SETTINGS.thresholds, dd.settings.thresholds || {}), profile: Object.assign({}, DEFAULT_SETTINGS.profile, dd.settings.profile || {}) }); if(!stds.some(function(x){ return x.id === settings.defaultStd; })) settings.defaultStd = stds[0].id; S.currentId = analyses[0] ? analyses[0].id : null; S.pendingImport = null; saveAll(); renderRail(); renderMain(); toast('백업을 불러왔어요'); break; }
+    case 'importYes': { var dd = S.pendingImport.data; if(dd.analyses.length) analyses = dd.analyses; watched = cleanWatch(dd.watched); saveWatch(); stds = dd.standards.length ? dd.standards : stds; if(dd.settings) settings = Object.assign({}, DEFAULT_SETTINGS, dd.settings, { weights: Object.assign({}, DEFAULT_SETTINGS.weights, dd.settings.weights || {}), thresholds: Object.assign({}, DEFAULT_SETTINGS.thresholds, dd.settings.thresholds || {}), profile: Object.assign({}, DEFAULT_SETTINGS.profile, dd.settings.profile || {}) }); if(!stds.some(function(x){ return x.id === settings.defaultStd; })) settings.defaultStd = stds[0].id; fixStdRefs(); S.stdChoice = 'auto'; S.currentId = analyses[0] ? analyses[0].id : null; S.pendingImport = null; saveAll(); renderRail(); renderMain(); toast('백업을 불러왔어요'); break; }
     case 'stopAi': if(S.ctl) S.ctl.abort(); break;
     case 'stopOcr': S.ocrStop = true; if(S.ctl) S.ctl.abort(); toast('글자 인식을 멈추는 중이에요'); break;
     case 'aiNow': aiNow(); break;
@@ -2588,12 +2898,16 @@ document.addEventListener('click', function(e){
     case 'exportXlsx': if(an) exportXlsx(an); break;
     case 'copyBrief': if(an){ var ev = evalOf(an); copyText(BL.brief(an, ev, getStd(an.stdId)), '보고용 요약을 복사했어요. 메신저나 메일에 붙여넣으세요.'); } break;
     case 'toggleBrief': S.showBrief = !S.showBrief; renderMain(); break;
+    case 'pdfLetter': if(an) exportLetterPdf(an); break;
+    case 'translate': if(an && !S.trBusy) translateLetter(an); break;
+    case 'copyTr': copyText($('#trTa').value, '번역을 복사했어요', $('#trTa')); break;
+    case 'saveTr': if(an && S.tr) saveFile(fileBase(an) + '_Clarification_' + S.tr.lang + '.txt', $('#trTa').value); break;
     case 'copyLetter': copyText($('#letterTa').value, '질의서 본문을 복사했어요', $('#letterTa')); break;
     case 'saveLetter': if(an) saveFile(fileBase(an) + '_Clarification.txt', $('#letterTa').value).then(function(okd){ if(!okd) copyText($('#letterTa').value, '파일 저장을 쓸 수 없어 본문을 복사했어요.', $('#letterTa')); }); break;
     case 'resetLetter': if(an){ an.letterEdited = false; an.letterText = null; saveAll(); renderMain(); } break;
     case 'letterSent': if(an){ an.done = an.done || {}; an.done.clar = !an.done.clar; saveAll(); toast(an.done.clar ? '질의서 발송 완료로 표시했어요 · 제출 준비에도 반영했어요' : '발송 완료 표시를 취소했어요'); renderMain(); } break;
     case 'noteFor': S.noteKeys = S.noteKeys || {}; S.noteKeys[d.k] = 1; S.tab = 'notes'; renderMain(); setTimeout(function(){ var n = $('#nt-' + d.k); if(n){ n.focus(); n.scrollIntoView({ block: 'center' }); } }, 30); break;
-    case 'delNo': S.pendingDelete = null; renderMain(); break;
+    case 'delNo': S.focusTo = S.pendingDelete ? '[data-del="' + S.pendingDelete + '"]' : null; S.pendingDelete = null; renderMain(); break;
     case 'stdNew': S.editingStd = 'new'; renderMain(); break;
     case 'stdFromRfp': if(an){ var base = JSON.parse(JSON.stringify(getStd(an.stdId) || stds[0])); var F = an.fields; base.id = null; base.example = false;
       if(F.voltage){ base.hv = F.voltage.v.hv; if(F.voltage.v.lv != null) base.lv = F.voltage.v.lv; }
@@ -2603,14 +2917,15 @@ document.addEventListener('click', function(e){
       if(F.noise && !F.noise.v.power) base.noise = F.noise.v.db; if(F.insulation && F.insulation.v.ester) base.insulation = 'ester';
       if(F.frequency) base.freq = String(F.frequency.v.hz); if(F.cooling) base.cooling = F.cooling.v.codes.slice(); if(F.bil) base.bil = F.bil.v.kv; if(F.impedance) base.z = F.impedance.v.pct; if(F.insulation && !F.insulation.v.ester) base.insulation = F.insulation.v.type; if(F.standard) base.standard = F.standard.v.std;
       base.name = base.hv + (base.lv ? '/' + base.lv : '') + ' kV ' + (base.stages && base.stages.length > 1 ? base.stages.join('/') : base.mva) + ' MVA ' + (base.insulation === 'dry' ? '몰드 변압기' : '유입식') + ' (' + (base.cooling || []).join('/') + ')';
-      S.stdDraft = base; S.draftFor = an.id; S.editingStd = 'draft'; setView('standards'); toast('입찰 사양을 채워 뒀어요. 자사 실제 값(납기·실적 등)을 확인하고 저장하세요.'); } break;
-    case 'stdCancel': S.editingStd = null; renderMain(); break;
-    case 'sdelNo': S.pendingStdDelete = null; renderMain(); break;
-    case 'addSample': seedSample(); saveAll(); S.currentId = analyses[0].id; S.tab = 'summary'; setView('result'); toast('샘플 분석을 추가했어요'); break;
+      base.nll = null; base.ll = null; base.typeYear = null;
+      S.stdDraft = base; S.draftFor = an.id; S.editingStd = 'draft'; setView('standards'); toast('입찰 사양을 채워 뒀어요. 손실값 · 형식시험 연도는 비워 뒀으니 자사 실제 값(납기·실적 등)과 함께 확인하고 저장하세요.'); } break;
+    case 'stdCancel': { var back = S.editingStd === 'draft' && S.draftFor; S.editingStd = null; S.stdDraft = null; S.draftFor = null; if(back && analyses.some(function(a){ return a.id === back; })){ S.currentId = back; S.tab = 'summary'; setView('result'); } else renderMain(); break; }
+    case 'sdelNo': S.focusTo = S.pendingStdDelete ? '[data-sdel="' + S.pendingStdDelete + '"]' : null; S.pendingStdDelete = null; renderMain(); break;
+    case 'addSample': { var ex1 = analyses.filter(function(a){ return a.sample; })[0]; if(ex1){ S.currentId = ex1.id; S.tab = 'summary'; setView('result'); toast('샘플 분석이 이미 있어요 · 결과를 열었어요'); break; } seedSample(); saveAll(); S.currentId = analyses[0].id; S.tab = 'summary'; setView('result'); toast('샘플 분석을 추가했어요'); break; }
     case 'resetWeights': settings.weights = Object.assign({}, DEFAULT_SETTINGS.weights); settings.thresholds = Object.assign({}, DEFAULT_SETTINGS.thresholds); saveAll(); renderMain(); toast('기본값으로 되돌렸어요'); break;
-    case 'reset': S.pendingReset = true; renderMain(); break;
-    case 'resetNo': S.pendingReset = false; renderMain(); break;
-    case 'resetYes': LS.del('bl.analyses'); LS.del('bl.standards'); LS.del('bl.settings'); analyses = []; stds = JSON.parse(JSON.stringify(DEFAULT_STDS)); settings = JSON.parse(JSON.stringify(DEFAULT_SETTINGS)); settings.profile.name = session.name; settings.profile.email = session.email; seedSample(); saveAll(); S.currentId = analyses[0].id; S.pendingReset = false; setView('new'); toast('처음 상태로 돌렸어요'); break;
+    case 'reset': S.pendingReset = true; S.focusTo = '[data-act="resetNo"]'; renderMain(); break;
+    case 'resetNo': S.pendingReset = false; S.focusTo = '[data-act="reset"]'; renderMain(); break;
+    case 'resetYes': LS.del('bl.watch'); watched = []; LS.del('bl.analyses'); LS.del('bl.standards'); LS.del('bl.settings'); analyses = []; stds = JSON.parse(JSON.stringify(DEFAULT_STDS)); settings = JSON.parse(JSON.stringify(DEFAULT_SETTINGS)); settings.profile.name = session.name; settings.profile.email = session.email; if(session.demo){ settings.profile.name = 'Gildong Hong'; settings.profile.company = 'Hanbit Electric Co., Ltd.'; settings.profile.title = 'Overseas Sales Manager'; } seedSample(); saveAll(); S.currentId = analyses[0].id; S.pendingReset = false; setView('new'); toast('처음 상태로 돌렸어요'); break;
   }
 });
 document.addEventListener('change', function(e){
@@ -2657,12 +2972,12 @@ document.addEventListener('keydown', function(e){
   if((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches('a[data-theme-toggle]')){ e.preventDefault(); themeOpen = !themeOpen; renderThemer(); }
   if(e.key === 'Escape' && S.screen === 'app' && (S.renaming || S.editKey)){ S.renaming = false; S.editKey = null; S.editErr = ''; renderMain(); }
   var tb = e.target.closest && e.target.closest('[role="tab"]');
-  if(tb && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')){ var all = $$('[role="tab"]'), i = all.indexOf(tb), nx = all[(i + (e.key === 'ArrowRight' ? 1 : all.length - 1)) % all.length]; if(nx){ S.tab = nx.dataset.tab; renderMain(); var f = $('[role="tab"][data-tab="' + S.tab + '"]'); if(f) f.focus(); } }
+  if(tb && /^(?:ArrowRight|ArrowLeft|Home|End)$/.test(e.key)){ e.preventDefault(); var all = $$('[role="tab"]'), i = all.indexOf(tb), nx = e.key === 'Home' ? all[0] : e.key === 'End' ? all[all.length - 1] : all[(i + (e.key === 'ArrowRight' ? 1 : all.length - 1)) % all.length]; if(nx){ S.tab = nx.dataset.tab; renderMain(); var f = $('[role="tab"][data-tab="' + S.tab + '"]'); if(f) f.focus(); } }
 });
 (function(){ document.documentElement.dataset.theme = 'b'; var th = $('#themer'); if(th){ th.hidden = true; th.innerHTML = ''; } })();
 
 /* ---------------- Boot ---------------- */
-go('intro');
+(function(){ var inApp = false; try { inApp = !!session && sessionStorage.getItem('bl.inapp') === '1'; } catch(e){} if(inApp){ S.enteredApp = true; loadNav(sessionStorage); go('app'); } else go('intro'); })();
 if(window.claude && typeof window.claude.use === 'function'){
   window.claude.use('sample').then(function(s){
     S.ai = s || null;
